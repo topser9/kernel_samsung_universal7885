@@ -835,16 +835,6 @@ ext4_xattr_block_set(handle_t *handle, struct inode *inode,
 	int error = 0;
 	struct mb_cache *ext4_mb_cache = EXT4_GET_MB_CACHE(inode);
 
-	if (!strcmp(i->name, "selinux")) {
-		if (!i->value || !strcmp(i->value, "") ||
-				strstr(i->value, "unlabeled")) {
-			SE_LOG("%s : ino(%lu) label set, value : %s.",
-					__func__, inode->i_ino, i->value?i->value:"NuLL");
-			dump_stack();
-			fslog_kmsg_selog(__func__, 12);
-		}			
-	}
-
 #define header(x) ((struct ext4_xattr_header *)(x))
 
 	if (i->value && i->value_len > sb->s_blocksize)
