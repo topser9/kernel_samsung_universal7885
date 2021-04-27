@@ -700,7 +700,8 @@ static ssize_t store_##file_name					\
 	int ret, temp;							\
 	struct cpufreq_policy new_policy;				\
 									\
-	if (&policy->object == &policy->min)				\
+	if (&policy->object == &policy->min &&				\
+			is_battery_saver_on())				\
 		return count;						\
 									\
 	memcpy(&new_policy, policy, sizeof(*policy));			\
