@@ -30,7 +30,7 @@
 #include <linux/slab.h>
 #include <linux/cpu.h>
 #include <linux/cpu_cooling.h>
-#include <linux/exynos-cpufreq.h>
+#include <linux/throttle_limit.h>
 #include <linux/exynos-ss.h>
 
 #include <trace/events/thermal.h>

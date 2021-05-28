@@ -17,6 +17,7 @@
 #include <linux/cpumask.h>
 #include <linux/cpufreq.h>
 #include <linux/pm_opp.h>
+#include <linux/throttle_limit.h>
 
 #include <soc/samsung/exynos-cpu_hotplug.h>
 #include <soc/samsung/cal-if.h>
