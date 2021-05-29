@@ -48,6 +48,7 @@ static int sse_mode;
 
 unsigned int big_throttle_limit = 0;
 unsigned int little_throttle_limit = 0;
+unsigned int gpu_throttle_limit = 0;
 
 bool is_throttle_limit(unsigned int clipped_freq, int cpu)
 {
@@ -544,19 +545,20 @@ __ATTR(cpufreq_table, 0444, show_cpufreq_table, NULL);
 static ssize_t show_throttle_limit(struct kobject *kobj,
 				struct kobj_attribute *attr, char *buf)
 {
-	return snprintf(buf, 16, "%u:%u", big_throttle_limit, little_throttle_limit);
+	return snprintf(buf, 24, "%u:%u:%u", big_throttle_limit, little_throttle_limit, gpu_throttle_limit);
 }
 
 static ssize_t store_throttle_limit(struct kobject *kobj, struct kobj_attribute *attr,
 					const char *buf, size_t count)
 {
-	unsigned int big_throttle, little_throttle;
+	unsigned int big_throttle, little_throttle, gpu_throttle;
 
-	if (sscanf(buf, "%u:%u", &big_throttle, &little_throttle) != 2)
+	if (sscanf(buf, "%u:%u:%u", &big_throttle, &little_throttle, &gpu_throttle) != 3)
 		return -EINVAL;
 
 	big_throttle_limit = big_throttle;
 	little_throttle_limit = little_throttle;
+	gpu_throttle_limit = gpu_throttle;
 
 	return count;
 }
