@@ -1,0 +1,59 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7884-gview2lte_usa_att_common.dtsi"
+#include "battery_data_gview2lte_usa_04.dtsi"
+#include "exynos7884-gview2lte_usa_att_gpio_04.dtsi"
+#include "exynos7885-jackpotlte_svcled.dtsi"
+#include "ccic-s2mm005_gview2_00.dtsi"
+
+
+/ {
+	model = "Samsung GVIEW2LTE USA ATT rev04 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <4>;
+	model_info-hw_rev_end = <4>;
+	compatible = "samsung, GVIEW2LTE USA ATT rev04", "samsung,Universal7884";
+
+	/* USIM DETECTION FOR CP */
+	usim_det {
+		pinctrl-names = "default";
+		pinctrl-0 = <&sim1_det_gpio>;
+		mif,num_of_usim_det = <1>;
+		mif,usim-det0-gpio = <&gpa2 5 0>;
+	};
+
+	pinctrl@13430000 {
+		sd2_clk: sd2-clk {
+			samsung,pins = "gpf4-0";
+			samsung,pin-function = <2>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <3>;
+		};
+	};
+
+	speedy@11CE0000 {
+		audio_codec_cod3035x: cod3035x@03 {
+			but-zones-list = <&but_zones 226 0 193>,
+					 <&but_zones 582 194 270>,
+					 <&but_zones 115 271 462>,
+					 <&but_zones 114 463 1061>;
+			mic-adc-range = <1266>;
+			btn-release-value = <1266>;
+		};
+	};
+
+	/delete-node/ fm@14840000;
+};
+

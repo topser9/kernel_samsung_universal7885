@@ -1,0 +1,89 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+#include "exynos7885-a7y18lte_common.dtsi"
+#include "exynos7885-a7y18lte_kor_single_gpio_00.dtsi"
+#include "exynos7885-a7y18lte_fingerprint-sensor_00.dtsi"
+
+/ {
+	model = "Samsung A7Y18LTE KOR SINGLE rev00 board based on EXYNOS7885";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <0>;
+	model_info-hw_rev_end = <0>;
+	compatible = "samsung, A7Y18 KOR SINGLE rev00", "samsung,Universal7885";
+
+	 /* USIM DETECTION FOR CP */
+	usim_det {
+		pinctrl-names = "default";
+		pinctrl-0 = <&sim0_det_gpio>;
+		mif,num_of_usim_det = <1>;
+		mif,usim-det0-gpio = <&gpa2 6 0>;
+	};
+
+	tsp_ldo_en {
+		regulator-boot-on;
+	};
+
+	i2c_4:i2c@13870000 {
+		samsung,stop-after-trans;	/* LSI IC ONLY */
+		touchscreen@48 {
+			compatible = "sec,sec_ts";
+			reg = <0x48>;
+			pinctrl-names = "on_state", "off_state";
+			pinctrl-0 = <&attn_irq>;
+			pinctrl-1 = <&attn_input>;
+			sec,tsp-id_gpio = <&gpg2 6 0>;
+			sec,irq_gpio = <&gpa0 0 0>;
+			sec,irq_type = <8200>;
+			sec,num_lines = <30 15>;        /* rx tx */
+			sec,max_coords = <4096 4096>;   /* x y */
+			sec,use_ic_resolution;
+			sec,mis_cal_check = <1>;
+			sec,use_gpio_ldo;
+			sec,regulator_avdd = "tsp_ldo_en";
+			sec,regulator_boot_on;
+			sec,grip_area = <512>;
+			sec,bringup = <3>;
+			sec,project_name = "A7_2018", "A605";
+			sec,firmware_name = "tsp_sec/y661_a750f.fw", "tsp_sec/y661_a750f.fw";
+			sec,tclm_level = <1>;
+			sec,afe_base = <0x00>;
+			status = "okay";
+		};
+	};
+
+	/* CAMERA PERI FOR HW_REV00 */
+	fimc_is_rear_module_imx576: fimc-is_rear_sensor_imx576@1A {
+		af {
+			product_name = <22>;    /* ACTUATOR_NAME_DW9823 */
+			i2c_addr = <0x18>;      /* I2C_ADDRESS */
+			i2c_ch = <3>;
+		};
+	};
+
+	hsi2c_3: hsi2c@138D0000 {
+		rear_eeprom@B0 {
+			compatible = "samsung,rear-eeprom-i2c";
+			reg = <0x51>;          /* 7bit-addr */
+		};
+		
+		fimc-is-actuator@18 {
+			compatible = "samsung,exynos5-fimc-is-actuator-dw9823";
+			reg = <0x0C>;
+			id = <0>;              /* matching sensor id */
+			place = <0>;
+		};
+	};
+};
+

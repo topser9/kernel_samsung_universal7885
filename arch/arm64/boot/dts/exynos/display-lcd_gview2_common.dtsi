@@ -1,0 +1,160 @@
+/*
+ * SAMSUNG LCD Panel Device Tree Source
+ *
+ * Copyright (c) Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/ {
+	decon_board_sn65dsi86: decon_board_sn65dsi86 {
+		compatible = "simple-bus";
+		pinctrl-names = "bridge_clk_off", "bridge_clk";
+		pinctrl-0 = <&disp_bridge_clk_off>;
+		pinctrl-1 = <&disp_bridge_clk>;
+
+		gpio_visual_dcdc_en = <&gpp2 3 0>;
+		gpio_lcd_blic_on = <&gpg1 7 0>;
+		gpio_lcd_buckboost_en = <&gpg2 4 0>;
+		gpio_bridge_en = <&gpg2 6 0>;
+		gpio_bridge_1p2_ldo_en = <&gpp3 2 0>;
+		gpio_bridge_1p8_ldo_en = <&gpg2 7 0>;
+
+		dsim_set_panel_power_early {
+			type =
+			"gpio,high",	"gpio_visual_dcdc_en",
+			"delay,mdelay",	"1",
+			"gpio,high",	"gpio_lcd_buckboost_en",
+			"delay,mdelay",	"1",
+			"gpio,high",	"gpio_lcd_blic_on",
+			"delay,mdelay",	"1";
+		};
+		dsim_set_panel_power_enable {
+			type =
+			"gpio,high",	"gpio_bridge_1p2_ldo_en",
+			"delay,mdelay",	"1",
+			"gpio,high",	"gpio_bridge_1p8_ldo_en",
+			"delay,mdelay",	"1",
+			"pinctrl",	"bridge_clk",
+			"delay,mdelay",	"1";
+		};
+		dsim_set_panel_power_disable {
+			type =
+			"gpio,low",	"gpio_lcd_blic_on",
+			"pinctrl",	"bridge_clk_off",
+			"gpio,low",	"gpio_bridge_en",
+			"gpio,low",	"gpio_bridge_1p2_ldo_en",
+			"gpio,low",	"gpio_bridge_1p8_ldo_en",
+			"gpio,low",	"gpio_lcd_buckboost_en",
+			"gpio,low",	"gpio_visual_dcdc_en",
+			"delay,msleep",	"100";
+		};
+		dsim_reset_panel {
+			type =
+			"gpio,high",	"gpio_bridge_en",
+			"delay,msleep",	"100";
+		};
+	};
+
+	sn65dsi86: sn65dsi86 {
+		mode = <0>; /* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+		resolution = <1920 1080>;
+		size = <382 214>;	/* 381.888(H) x 213.812(V) */
+		timing,refresh = <60>;
+		/* HBP HFP HSW */
+		timing,h-porch = <142 48 32>;
+		/* VBP VFP VSW */
+		timing,v-porch = <13 3 6>;
+		timing,dsi-hs-clk = <936>;
+		timing,pms = <1 72 1>;
+		timing,dsi-escape-clk = <16>;
+		mic_en = <0>;		/* 0: Disable, 1: Enable */
+		mic_ratio = <0>;	/* 0: 1/2 mic, 1: 1/3 mic */
+		mic_ver = <0>;		/* 0: mic v1.1, 1: v1.2, 2: v2.0 */
+		type_of_ddi = <0>;	/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+		dsc_en = <0>;		/* 0: Disable, 1: Enable */
+		dsc_cnt = <0>;		/* used DSC count */
+		dsc_slice_num = <0>;	/* count of dsc slice */
+		data_lane = <4>;	/* number of using data lane */
+		vt_compensation = <1397>;	/* for difference between wordclk and vclk at video mode */
+		decon_board = <&decon_board_sn65dsi86>;
+	};
+};
+
+&dsim_0 {
+	lcd_info = <&sn65dsi86>;
+};
+
+&decon_f {
+	psr_mode = <0>;		/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+	trig_mode = <1>;	/* 0: hw trigger, 1: sw trigger */
+	dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
+
+	disp_freq = <267000>;
+};
+
+/* pinctrl_0: pinctrl@11CB0000 */
+&pinctrl_0 {
+	disp_bridge_clk: disp_bridge_clk {
+		samsung,pins = "gpq0-0";
+		samsung,pin-function = <2>;
+	};
+
+	disp_bridge_clk_off: disp_bridge_clk_off {
+		samsung,pins = "gpq0-0";
+		samsung,pin-function = <0>;
+	};
+};
+
+/* pinctrl_3: pinctrl@139B0000 */
+&i2c6_bus {
+	samsung,pins = "gpp4-5", "gpp4-4";
+	samsung,pin-function = <2>;
+	samsung,pin-pud = <0>;
+	samsung,pin-drv = <0>;
+};
+
+/* i2c_6: i2c@13890000 */
+&i2c_6 {
+	status = "okay";
+	samsung,i2c-max-bus-freq = <400000>;
+
+	sn65dsi86@2C {
+		compatible = "i2c,sn65dsi86";
+		reg = <0x2C>;
+	};
+};
+
+/* usi_2: usi@10032008 */
+&usi_2 {
+	/* usi_mode = "hsi2c0" or "hsi2c1" or "spi" or "uart"
+		      or "hsi2c0_hsi2c1" or "uart_hsi2c1"    */
+	usi_mode = "hsi2c0_hsi2c1";
+	status = "okay";
+};
+
+/* hsi2c_8: hsi2c@13980000 */
+&hsi2c_8 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	lp8558@2C {
+		compatible = "i2c,lp8558_1";
+		reg = <0x2C>;
+	};
+};
+
+/* hsi2c_9: hsi2c@13990000 */
+&hsi2c_9 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	lp8558@2C {
+		compatible = "i2c,lp8558_2";
+		reg = <0x2C>;
+	};
+};
+

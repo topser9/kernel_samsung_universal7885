@@ -1,0 +1,89 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7884-j7topelte_common.dtsi"
+#include "exynos7884-j7topelte_usa_gpio_00.dtsi"
+
+/ {
+	model = "Samsung J7TOPELTE VZW rev00 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <0>;
+	model_info-hw_rev_end = <0>;
+	compatible = "samsung, J7TOPELTE VZW rev00", "samsung,Universal7884";
+
+	pinctrl@139B0000 {
+		cfg_i2c: cfg-i2c {
+			samsung,pins = "gpc1-7", "gpc1-6";
+			samsung,pin-function = <2>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <0>;
+		};
+		cfg_gpio: cfg-gpio {
+			samsung,pins = "gpc1-7", "gpc1-6";
+			samsung,pin-function = <0>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <0>;
+		};
+	};
+
+	i2c_4:i2c@13870000 {
+		touchscreen@48 {
+			status = "disabled";
+		};
+	};
+
+	i2c@20 {
+		gpios = <&gpc1 6 0 &gpc1 7 0>;
+		touchkey@20 {
+			coreriver,scl-gpio = <&gpc1 7 0>;
+			coreriver,sda-gpio = <&gpc1 6 0>;
+		};
+	};
+
+	i2c_5: i2c@13880000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&i2c5_bus>;
+
+		stk3013@48 {
+			compatible = "stk,stk3013";
+			reg = <0x48>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <4 0 0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&prox_int>;
+			stk,irq-gpio = <&gpa0 4 0x00>;
+			stk,state-reg = <0x2c>;
+			stk,psctrl-reg = <0x70>;
+			stk,alsctrl-reg = <0x2A>;
+			stk,ledctrl-reg = <0xFF>;
+			stk,wait-reg = <0x03>;
+			stk,ps-thd-h = <18>;
+			stk,ps-thd-l = <12>;
+			stk,ps-cancel-thd-h = <9>;
+			stk,ps-cancel-thd-l = <6>;
+			stk,ps-cal-skip-adc = <10>;
+			stk,ps-cal-fail-adc = <20>;
+			stk,ps-default-offset = <0>;
+			stk,transmittance = <500>;
+		};
+	};
+
+	sound {
+		mixer-paths = "mixer_paths_r06.xml";
+	};	
+};
+

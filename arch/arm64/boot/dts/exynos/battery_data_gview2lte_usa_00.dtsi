@@ -1,0 +1,64 @@
+/*
+ * Jackpot Battery parameters device tree file for board IDs 04 and higher
+ *
+ * Copyright (C) 2017 Samsung Electronics, Inc.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/ {
+	hsi2c_6: hsi2c@13940000 { /* hsi2c 6 */
+		status = "disabled";
+	};
+
+	battery {
+		battery,charger_name = "max77865-charger";
+
+		battery,temp_check_type = <0>; /* SEC_BATTERY_TEMP_CHECK_NONE */
+		battery,chg_temp_check = <0>;
+
+		battery,temp_table_adc = <1378 1586 1811 2048 2291>;
+		battery,temp_table_data = <400 350 300 250 200>;
+
+		battery,chg_temp_table_adc = <1378 1586 1811 2048 2291>;
+		battery,chg_temp_table_data = <400 350 300 250 200>;
+
+		battery,ttf_hv_charge_current = <2300>;
+
+		battery,pd_charging_charge_power = <15000>;
+		battery,max_charging_current = <2300>;
+		battery,battery_full_capacity = <8000>;
+
+		battery,standard_curr = <2300>;
+		battery,expired_time = <25200>;
+
+		io-channels = <&exynos_adc 1>, <&exynos_adc 0>;
+		io-channel-names = "adc-temp", "adc-chg-temp";
+		#io-channel-cells = <2>;
+		io-channel-ranges;
+	};
+
+	sec-multi-charger {
+		status = "disabled";
+	};
+
+	max77865-fuelgauge {
+		fuelgauge,v_empty = <0xA7E2>; /* Empty: 3260mV, Recover: 3480mV */
+		fuelgauge,qrtable20 = <0x0E0A>;
+		fuelgauge,qrtable30 = <0x098C>;
+		fuelgauge,capacity = <0x1F40>;
+		fuelgauge,ttf_capacity = <8000>;
+	};
+};

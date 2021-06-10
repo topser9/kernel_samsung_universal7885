@@ -1,0 +1,42 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+#include "exynos7885-a7y18lte_common.dtsi"
+#include "exynos7885-a7y18lte_kor_single_gpio_01.dtsi"
+#include "exynos7885-a7y18lte_fingerprint-sensor_00.dtsi"
+#include "exynos7885-a7y18lte_kor-tdmb-00.dtsi"
+
+
+/ {
+	model = "Samsung A7Y18LTE KOR SINGLE rev01 board based on EXYNOS7885";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <1>;
+	model_info-hw_rev_end = <2>;
+	compatible = "samsung, A7Y18 KOR SINGLE rev01", "samsung,Universal7885";
+
+	 /* USIM DETECTION FOR CP */
+	usim_det {
+		pinctrl-names = "default";
+		pinctrl-0 = <&sim0_det_gpio>;
+		mif,num_of_usim_det = <1>;
+		mif,usim-det0-gpio = <&gpa2 6 0>;
+	};
+
+	i2c_4:i2c@13870000 {
+		touchscreen@50 {
+			status = "okay";
+		};
+	};
+};
+

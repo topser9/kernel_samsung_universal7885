@@ -1,0 +1,34 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7885-a7y18_common.dtsi"
+#include "exynos7885-a7y18_jpn_rkt_gpio_00.dtsi"
+#include "exynos7885-a7y18_jpn_rkt_fingerprint-sensor_00.dtsi"
+
+/ {
+	compatible = "samsung, A7Y18 JPN RKT 00", "samsung,EXYNOS7885";
+	dtbo-hw_rev = <0>;
+	dtbo-hw_rev_end = <255>;
+
+        fragment@model {
+                target-path = "/";
+                __overlay__ {
+                        #address-cells = <2>;
+                        #size-cells = <1>;
+
+                        model = "Samsung A7Y18 JPN RKT 00 board based on EXYNOS7885";
+                }; /* end of __overlay__ */
+        }; /* end of fragment */
+};
+

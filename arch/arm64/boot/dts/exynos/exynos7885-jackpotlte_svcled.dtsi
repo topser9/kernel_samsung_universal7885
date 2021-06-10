@@ -1,0 +1,23 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/ {
+	s2mu004_led {
+		status = "okay";
+		compatible = "s2mu004_led";
+		brightness = <100>;
+		lp_brightness = <100>;
+		nleds = <3>;
+		led_color = "RGB";
+		ratio = <18 7 45 0>;
+		ratio_low = <2 1 3 0>;
+	};
+};

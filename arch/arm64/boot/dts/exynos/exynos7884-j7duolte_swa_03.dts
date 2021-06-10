@@ -1,0 +1,52 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+#include "exynos7884-j7duolte_common.dtsi"
+#include "exynos7884-j7duolte_swa_gpio_02.dtsi"
+#include "exynos7884-j7duolte_fingerprint-sensor_02.dtsi"
+
+/ {
+	model = "Samsung J7DUOLTE SWA rev03 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <3>;
+	model_info-hw_rev_end = <255>;
+	compatible = "samsung, J7DUOLTE SWA rev03", "samsung,Universal7884";
+
+	i2c_5: i2c@13880000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sensor_en &i2c5_bus>;
+
+		lis2ds@1D {
+			compatible = "st,lis2ds";
+			reg = <0x1D>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&acc_int>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <3 0 0>;
+			st,orientation = <1 2 1 0 1 1 1 1 0>;
+			st,drdy-int-pin = <1>;
+			st,irq_gpio = <&gpa0 3 0x00>;
+		};
+
+	};
+	i2c@20 {
+		touchkey@20 {
+			coreriver,fw_name = "coreriver/tc350k_j7duo_rev04.fw";
+		};
+	};
+};
+

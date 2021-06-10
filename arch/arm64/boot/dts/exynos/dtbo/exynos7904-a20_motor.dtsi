@@ -1,0 +1,29 @@
+/*
+ * SAMSUNG A30 board device tree source
+ *
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	fragment@motor {
+		target-path = "/";
+		__overlay__ {
+			/* VIBRATOR */
+			s2mu106-haptic {
+				status = "okay";
+				haptic,operation_mode = <2>; /* 0 : ERM_I2C, 1 : ERM_GPIO, 2 : LRA */
+				haptic,max_timeout = <10000>;
+				haptic,duty   = <37727>;
+				haptic,period = <38109>;
+				haptic,intensity = <67>;
+				haptic,pwm_id = <1>;
+				haptic,type = "LINEAR";
+			};
+		};
+	};
+};

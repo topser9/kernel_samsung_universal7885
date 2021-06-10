@@ -1,0 +1,33 @@
+/*
+ * SAMSUNG UNIVERSAL8895 board device tree source
+ *
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/ {
+	haptic {
+		status = "okay";
+		haptic,model = <1>;
+		haptic,max_timeout = <10000>;
+		/* for multi-frequency */
+		haptic,multi_frequency = <7>;
+		/* frequency for drv haptic engine */
+		/* frequency   alert low  mid  high  0 */
+		/* frequency   159hz 120hz, 150hz, 200hz, 180hz press release*/
+		haptic,freq = <0x39 0x69 0x41 0x19 0x27 0x19 0x19>;
+		haptic,duty = <0x45 0x45 0x45 0x45 0x45 0x7c 0x7c>;
+		
+		/* Haptic dont support motor */
+		haptic,period = <4807692>;
+		haptic,duty_rate = <2403846>;		
+		haptic,pwm_id = <0>;
+		haptic,alert_duty = <0x5b>;
+	};
+};
+
+

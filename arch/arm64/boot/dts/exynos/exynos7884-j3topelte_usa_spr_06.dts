@@ -1,0 +1,183 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7884-j3topelte_common.dtsi"
+#include "exynos7884-j3topelte_usa_spr_gpio_06.dtsi"
+
+/ {
+	model = "Samsung J3TOPELTE SPR rev06 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <6>;
+	model_info-hw_rev_end = <6>;
+	compatible = "samsung, J3TOPELTE SPR rev06", "samsung,Universal7884";
+
+	i2c@20 {
+		gpios = <&gpp7 0 0
+				&gpp7 1 0>;
+		touchkey@20 {
+			coreriver,scl-gpio = <&gpp7 1 0>;
+			coreriver,sda-gpio = <&gpp7 0 0>;
+		};
+	};
+
+	pinctrl@139B0000 {
+		cfg_i2c: cfg-i2c {
+			samsung,pins = "gpp7-1", "gpp7-0";
+			samsung,pin-function = <2>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <0>;
+		};
+		cfg_gpio: cfg-gpio {
+			samsung,pins = "gpp7-1", "gpp7-0";
+			samsung,pin-function = <0>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <0>;
+		};
+	};
+
+	speedy@11CE0000 {
+		audio_codec_cod3035x: cod3035x@03 {
+		use-lassenA;
+		};
+	};
+
+	hsi2c_9: hsi2c@13990000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-frequency = <400000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hs_i2c9_bus>;
+
+		yas539@2e {
+			compatible = "yas_magnetometer";
+			reg = <0x2e>;
+			yas,orientation = <5>;
+			yas,softiron = <10671 593 278 723 9485 41 21 7 10833>;
+			yas,softiron_sign = <2 2 2 2 2 0 0 0 2>;
+		};
+	};
+
+	spi_0: spi@13900000 {
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&spi0_bus_acc>;
+
+		lsm6dsl@0 {
+			compatible = "st,lsm6dsl";
+			reg = <0>;
+			spi-max-frequency = <13000000>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&acc_int>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <3 0 0>;
+			st,irq_gpio = <&gpa0 3 0>;
+			st,orientation = <1 2 1 2 1 1 1 1 0>;
+			controller-data {
+				samsung,spi-feedback-delay = <0>;
+				samsung,spi-chip-select-mode = <0>;
+			};
+		};
+	};
+
+	i2c_5: i2c@13880000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sensor_en &i2c5_bus>;
+
+		gp2a@39 {
+			compatible = "gp2a-i2c";
+			reg = <0x39>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <4 0 0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&prox_int>;
+			gp2a,irq-gpio = <&gpa0 4 0x00>;
+			gp2a,regulator_divided = <1>;
+			gp2a,default_high_thd = <110>;
+			gp2a,default_low_thd = <70>;
+			gp2a,reg_intval = <0x03>;
+			gp2a,reg_res_p = <0x20>;
+			gp2a,reg_ledctrl = <0x24>;
+			gp2a,reg_prst = <0x38>;
+			gp2a,default_offset = <20>;
+			gp2a,cancel_high_thd = <50>;
+			gp2a,cancel_low_thd = <40>;
+			gp2a,cal_skip_adc = <48>;
+		};
+	};
+
+	cpufreq {
+		domain@0 {
+			max-freq = <1586000>;
+
+			dm-constraints {
+				mif-perf {
+					table = < 1690000 1794000
+						  1586000 1794000
+						  1482000 1539000
+						  1352000 1539000
+						  1248000 1352000
+						  1144000 1014000
+						  1014000  845000
+						   902000  676000
+						   839000  676000
+						   757000  546000
+						   676000  546000
+						   546000  420000
+						   449000  420000
+						   343000  420000
+						   208000  420000>;
+				};
+			};
+		};
+	};
+
+	devfreq_1: devfreq_int@17000020 {
+		compatible = "samsung,exynos-devfreq";
+		reg = <0x0 0x17000020 0x0>;
+		devfreq_type = "int";
+		devfreq_domain_name = "dvfs_int";
+
+		/* Delay time */
+		use_delay_time = "false";
+
+		freq_info = <533000 107000 107000 107000 533000 533000>;
+		/* <initial_freq, default_qos, suspend_freq, min, max, reboot_freq> */
+
+		/* Booting value */
+		boot_info = <40 533000>;
+		/* boot_qos_timeout, boot_freq */
+
+		/* default_dev_profile */
+		use_get_dev = "false";
+		polling_ms = <0>;
+
+		/* governor data */
+		gov_name = "interactive";
+		use_reg = "false";
+
+		use_tmu = "true";
+		use_cl_dvfs = "false";
+		use_sw_clk = "false";
+		dfs_id = <ACPM_DVFS_INT>;
+		acpm-ipc-channel = <1>;
+		use_acpm = "true";
+	};
+};
+

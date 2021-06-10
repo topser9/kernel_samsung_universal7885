@@ -1,0 +1,160 @@
+/*
+ * SAMSUNG EXYNOS7884 board device tree source
+
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7884-xcover4s_common.dtsi"
+#include "exynos7884-xcover4s_eur_open_gpio_00.dtsi"
+/ {
+	compatible = "samsung,XCOVER4S EUR OPEN 02", "samsung,EXYNOS7884";
+
+	dtbo-hw_rev = <2>;
+    dtbo-hw_rev_end = <255>;
+
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung XCOVER4S EUR OPEN 00 board based on EXYNOS7884";
+
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&i2c_4 {
+	mms_ts@48 {
+		status = "okay";
+	};
+};
+
+&pinctrl_0 { //11CB0000
+	nfc_clk: nfc-clk {
+		samsung,pins = "gpq0-0";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+	};
+
+	nfc_int: nfc-int {
+		samsung,pins = "gpa1-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+};
+
+&pinctrl_3 { //139B0000
+	nfc_pvdd_en: nfc_pvdd_en {
+		samsung,pins = "gpp6-4";
+		samsung,pin-function = <1>;
+		samsung,pin-pud = <0>;
+		samsung,pin-val = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_firm: nfc_firm {
+		samsung,pins = "gpp3-2";
+		samsung,pin-function = <1>;
+		samsung,pin-pud = <0>;
+		samsung,pin-val = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_pd: nfc_pd {
+		samsung,pins = "gpp2-2";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_clk_req: nfc_clk_req {
+		samsung,pins = "gpp2-3";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <1>;
+		samsung,pin-drv = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_det: nfc-det {
+		samsung,pins = "gpg2-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+	};
+};
+
+&usi_0 {
+	usi_mode = "hsi2c0_hsi2c1";
+	status = "okay";
+};
+
+&hsi2c_5 {
+	status = "okay";
+	clock-frequency = <400000>;  /*   400 kHz  */
+	pn547@2B {
+		compatible = "pn547";
+		reg = <0x2B>;
+
+		interrupt-parent = <&gpa1>;
+		interrupts = <0 0 0>;
+
+		pn547,nfc_pd = <&gpp2 2 0x2>;
+		pn547,firm-gpio = <&gpp3 2 1>;
+		pn547,irq-gpio = <&gpa1 0 0>;
+		pn547,nfc_clkreq = <&gpp2 3 0x2>;
+		pn547,pvdd-gpio = <&gpp6 4 1>;
+		pn547,check_nfc =<&gpg2 2 0x0>;
+		clkctrl-reg = <0x11C8600C>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&nfc_pd &nfc_firm &nfc_int &nfc_clk &nfc_pvdd_en &nfc_clk_req &nfc_det>;
+	};
+};
+
+&i2c_5 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c5_bus>;
+
+	cm36686@60 {
+		compatible = "cm36686";
+		reg = <0x60>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&proxy_int &prox_led_en>;
+		interrupt-parent = <&gpa0>;
+		interrupts = <4 0 0>;
+		cm36686,vled_ldo = <&gpp8 1 0x00>; 
+		cm36686,irq_gpio = <&gpa0 4 0x00>;
+		cm36686,vdd_always_on = <1>;
+		cm36686,vled_same_vdd = <0>;
+		cm36686,default_hi_thd = <21>;
+		cm36686,default_low_thd = <15>;
+		cm36686,cancel_hi_thd = <15>;
+		cm36686,cancel_low_thd = <10>;
+		cm36686,cal_skip_adc = <9>;
+		cm36686,cal_fail_adc = <25>;
+		cm36686,default_trim = <3>;
+	};
+};
+
+&mif_pdata {
+	pinctrl-names = "default";
+	mif,gpio_ds_det = <&gpf3 4 0>;
+};

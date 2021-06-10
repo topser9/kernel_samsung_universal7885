@@ -1,0 +1,114 @@
+/*
+ * SAMSUNG EXYNOS device tree source for reserved-memory
+ *
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <1>;
+		ranges;
+
+		fb_handover: framebuffer@0xEC000000 {
+			compatible = "exynos,dpu_fb_handover";
+			reg = <0x0 0xEC000000 0x1400000>;
+		};
+
+		gpu_crc {
+			compatible = "exynos8890-ion,gpu_crc";
+			ion,secure;
+			id = <8>;
+			reg = <0x0 0xE7000000 0x800000>;
+		};
+
+		gpu_buffer {
+			compatible = "exynos8890-ion,gpu_buffer";
+			ion,secure;
+			ion,reusable;
+			id = <9>;
+			reg = <0x0 0xE7800000 0x1800000>;
+		};
+
+		crypto {
+			compatible = "exynos8890-ion,crypto";
+			ion,reusable;
+			id = <1>;
+			reg = <0x0 0xEBC00000 0x800000>;
+		};
+
+		vnfw {
+			compatible = "exynos8890-ion,vnfw";
+			ion,reusable;
+			id = <7>;
+			reg = <0x0 0xEC400000 0x400000>;
+			compat-id = <20>;
+		};
+
+		vfw {
+			compatible = "exynos8890-ion,vfw";
+			ion,secure;
+			ion,reusable;
+			id = <2>;
+			reg = <0x0 0xEC800000 0x400000>;
+			compat-id = <24>;
+		};
+
+		vstream {
+			compatible = "exynos8890-ion,vstream";
+			ion,secure;
+			ion,reusable;
+			id = <3>;
+			reg = <0x0 0xECC00000 0x1C00000>;
+			compat-id = <25 31>;
+		};
+
+		vframe {
+			compatible = "exynos8890-ion,vframe";
+			ion,secure;
+			ion,reusable;
+			id = <5>;
+			reg = <0x0 0xEE800000 0x6000000>;
+			compat-id = <26 29>;
+		};
+
+		vscaler {
+			compatible = "exynos8890-ion,vscaler";
+			ion,secure;
+			ion,reusable;
+			id = <6>;
+			reg = <0x0 0xF4800000 0x3000000>;
+			compat-id = <28>;
+		};
+
+		modem_if {
+			compatible = "exynos,modem_if";
+			reg = <0x0 0xF7800000 0x8400000>;
+		};
+
+		gnss_reserved: gnss_if {
+			compatible = "exynos,gnss_if";
+			reg = <0x0 0xFFC00000 0x400000>;
+		};
+
+		seclog_mem {
+			compatible = "exynos,seclog";
+			reg = <0x0 0xC0000000 0x80000>;
+		};
+
+		wifibt_if {
+			compatible = "exynos,wifibt_if";
+			reg = <0x0 0xE9000000 0x400000>;
+		};
+
+		abox_rmem: abox_rmem@0xEA800000 {
+			compatible = "exynos,abox_rmem";
+			reg = <0x0 0xE9400000 0x2800000>;
+		};
+	};
+};

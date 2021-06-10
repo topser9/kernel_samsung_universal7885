@@ -1,0 +1,39 @@
+/*
+ * SAMSUNG EXYNOS7885 board device tree source
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7904-wisdom_common.dtsi"
+#include "exynos7904-wisdom_sea_open_gpio_00.dtsi"
+/ {
+	compatible = "samsung,WISDOM SEA OPEN 01", "samsung,EXYNOS7904";
+	dtbo-hw_rev = <3>;
+    dtbo-hw_rev_end = <255>;
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung WISDOM SEA OPEN 00 board based on EXYNOS7904";
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&abox {
+	abox_synchronized_ipc: abox_synchronized_ipc {
+		compatible = "samsung,abox-synchronized-ipc";
+		#sound-dai-cells = <1>;
+		abox = <&abox>;
+	};
+};

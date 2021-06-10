@@ -1,0 +1,74 @@
+/*
+ * SAMSUNG EXYNOS7904 board device tree source
+
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7904-gta3xlwifi_common.dtsi"
+#include "exynos7904-gta3xlwifi_eur_open_gpio_03.dtsi"
+#include "ccic-s2mm005_gta3xllte_00.dtsi"
+
+/ {
+	compatible = "samsung,GTA3XLWIFI EUR OPEN 03", "samsung,EXYNOS7904";
+
+	dtbo-hw_rev = <4>;
+    dtbo-hw_rev_end = <255>;
+
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung GTA3XLWIFI EUR OPEN 03 board based on EXYNOS7904";
+            gps {
+				compatible = "samsung,exynos54xx-bcm4753";
+				gpios = <&gpg2 0 0x1
+					 &gpa0 4 0xf
+					>;
+				status = "okay";
+			};
+
+			i2c@20 {
+				compatible = "i2c-gpio";
+				gpios = <&gpp7 0 0
+						&gpp7 1 0>;
+				i2c-gpio,delay-us = <2>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&grip_i2c>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "okay";
+
+				sx9360_wifi-i2c@28 {
+					compatible = "sx9360_wifi";
+					pinctrl-names = "default";
+					pinctrl-0 = <&grip_wifi_int>;
+					reg = <0x28>;
+					interrupt-parent = <&gpa0>;
+					interrupts = <5 0 0>;
+					sx9360_wifi,nirq-gpio = <&gpa0 5 0>;
+
+					sx9360_wifi,reggnrlctrl2 = <0x28>;		/* scanperiod: 81ms */
+					sx9360_wifi,regafeparam1phm = <0x14>;	/* again : 9 pF, sampling freq : 125 khz */
+					sx9360_wifi,regproxctrl0phm = <0x21>;	/* gain: x4, rawfilt : 1-1/2 */
+					sx9360_wifi,regproxctrl5 = <0x37>;		/* threshold: 288 */
+					sx9360_wifi,regproxctrl4 = <0x15>;		/* hysteresis: small, closedeb: 2 samples, fardeb: 2 samples */
+					sx9360_wifi,regproxctrl3 = <0x0D>;		/* AVGPOSFILT: 1/512, AVGNEGFILT: 1/2 */
+					sx9360_wifi,regafeparam0phm = <0x0E>;	/* resolution: 512 */
+				};
+			};
+
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */

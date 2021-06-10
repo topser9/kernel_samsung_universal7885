@@ -1,0 +1,54 @@
+/*
+ * SAMSUNG EXYNOS7904 board device tree source
+
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7904-gta4s_common.dtsi"
+#include "exynos7904-gta4s_usa_single_gpio_00.dtsi"
+
+/ {
+	compatible = "samsung,GTA4S USA SINGLE 02", "samsung,EXYNOS7904";
+
+	dtbo-hw_rev = <2>;
+    dtbo-hw_rev_end = <255>;
+
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung GTA4S USA SINGLE 02 board based on EXYNOS7904";
+			
+			speedy@11CE0000 {
+				audio_codec_cod3035x: cod3035x@03 {
+					water-threshold-max = <2700>;
+					water-threshold-min = <520>;
+					aux-cable-detect-adc = <480>;
+					fake-jack-adc = <420>;
+				};
+			};
+
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&pinctrl_2 { //13430000 
+	sd0_cmd: sd0-cmd { 
+		samsung,pins = "gpf0-1"; 
+		samsung,pin-function = <2>; 
+		samsung,pin-pud = <3>; 
+		samsung,pin-drv = <2>; 
+	}; 
+}; 

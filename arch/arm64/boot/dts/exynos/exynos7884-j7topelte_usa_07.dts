@@ -1,0 +1,67 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7884-j7topelte_common.dtsi"
+#include "exynos7884-j7topelte_usa_gpio_07.dtsi"
+
+/ {
+	model = "Samsung J7TOPELTE VZW rev07 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <7>;
+	model_info-hw_rev_end = <255>;
+	compatible = "samsung, J7TOPELTE VZW rev07", "samsung,Universal7884";
+
+	i2c_5: i2c@13880000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sensor_en &i2c5_bus>;
+
+		cm36686@60 {
+			compatible = "cm36686";
+			reg = <0x60>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&prox_int &prox_led_en>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <4 0 0>;
+			cm36686,vled_ldo = <&gpg3 2 0x00>;
+			cm36686,irq_gpio = <&gpa0 4 0x00>;
+			cm36686,vdd_always_on = <0>;
+			cm36686,vled_same_vdd = <0>;
+			cm36686,ps_conf1 = <0x03a4>;
+			cm36686,ps_conf3 = <0x4410>;
+			cm36686,default_hi_thd = <17>;
+			cm36686,default_low_thd = <10>;
+			cm36686,cancel_hi_thd = <15>;
+			cm36686,cancel_low_thd = <10>;
+			cm36686,cal_skip_adc = <9>;
+			cm36686,cal_fail_adc = <25>;
+			cm36686,default_trim = <6>;
+		};
+	};
+
+	muic {
+		new_factory;
+		dcd_timeout;
+	};
+
+	speedy@11CE0000 {
+		audio_codec_cod3035x: cod3035x@03 {
+			use-lassenA;
+		};
+	};
+
+};
+

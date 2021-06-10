@@ -1,0 +1,151 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7885-jackpotlte_common.dtsi"
+#include "exynos7885-jackpotlte_fingerprint-sensor_00.dtsi"
+#include "exynos7885-jackpotlte_can_open_gpio_05.dtsi"
+#include "exynos7885-jackpotlte_mst_02.dtsi"
+#include "exynos7885-jackpotlte_svcled.dtsi"
+#include "battery_data_jackpotlte_can.dtsi"
+
+/ {
+	model = "Samsung JACKPOTLTE CAN rev05 board based on EXYNOS7885";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <5>;
+	model_info-hw_rev_end = <5>;
+	compatible = "samsung, JACKPOTLTE CAN rev05", "samsung,Universal7885";
+
+	/* SENSORHUB */
+    spi_4: spi@13980000 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&spi4_miso &spi4_mosi &spi4_cs &spi4_clk>;
+        interrupts = <0 277 0>;
+
+        num-cs = <1>;
+        status = "okay";
+
+		STM32F@0 {
+			compatible = "ssp,STM32F";
+			reg = <0>;
+			spi-max-frequency = <8000000>;
+			spi-cpol;
+			spi-cpha;
+			pinctrl-names = "default";
+			pinctrl-0 = <&ssp_rst &ssp_ap_int &ssp_mcu_int1 &ssp_mcu_int2 &ssp_boot0>;
+
+			gpio-controller;
+			#gpio-cells = <2>;
+			ssp,mcu_int1-gpio = <&gpa1 2 0x00>;
+			ssp,mcu_int2-gpio = <&gpa1 3 0x00>;
+			ssp,ap_int-gpio = <&gpg1 6 0x01>;
+			ssp,rst-gpio = <&gpg3 5 0x01>;
+			ssp,boot0-gpio = <&gpg1 3 0x1>;
+			ssp,acc-position = <7>;
+			ssp,mag-position = <5>;
+			ssp-sns-combination = <0>;
+			ssp,prox-hi_thresh = <55>;
+			ssp,prox-low_thresh = <40>;
+			ssp,prox-detect_hi_thresh = <250>;
+			ssp,prox-detect_low_thresh = <130>;
+			ssp-ap-rev = <1>;
+			ssp-mag-array = /bits/ 8 <207 82 201 4 218 137 254 197 213
+                                    55 35 84 243 129 255 167 2 43
+                                    230 232 191 252 243 208 9 197 21>;
+			ssp-mag-type = <1>;
+			ssp-glass-type = <0>;
+			ssp-acc-type = <1>;
+			ssp-pressure-type = <1>;
+			ssp-project-type = <1>;
+
+
+            controller-data {
+                cs-gpio = <&gpp8 0 0>;
+                samsung,spi-feedback-delay = <0>;
+			};
+        };
+	};
+
+	pinctrl@139B0000 {
+		nfc_pvdd_en: nfc_pvdd_en {
+				samsung,pins = "gpg1-5";
+				samsung,pin-function = <1>;
+				samsung,pin-pud = <0>;
+				samsung,pin-val = <0>;
+				samsung,pin-con-pdn = <3>;
+				samsung,pin-pud-pdn = <0>;
+		};
+
+		nfc_firm: nfc_firm {
+			samsung,pins = "gpg1-4";
+			samsung,pin-function = <1>;
+			samsung,pin-pud = <0>;
+			samsung,pin-val = <0>;
+			samsung,pin-con-pdn = <3>;
+			samsung,pin-pud-pdn = <0>;
+		};
+	};
+
+	i2c_2: i2c@13850000 {
+		sec-nfc@27 {
+			sec-nfc,firm-gpio = <&gpg1 4 1>;
+			sec-nfc,pvdd_en = <&gpg1 5 1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&nfc_pd &nfc_firm &nfc_int &nfc_clk &nfc_pvdd_en &nfc_clk_req>;
+		};
+	};
+	
+	/* USIM DETECTION FOR CP */
+	usim_det {
+		pinctrl-names = "default";
+		pinctrl-0 = <&sim0_det_gpio &sim1_det_gpio>;
+		mif,num_of_usim_det = <2>;
+		mif,usim-det0-gpio = <&gpa2 6 0>;
+		mif,usim-det1-gpio = <&gpa2 5 0>;
+	};
+
+	/* motor control type :  1 = IFPMIC */
+	/*				2 = Mot driving IC */
+	motor {
+		motor,motor_type = <1>;
+	};
+
+	pinctrl@139B0000 {
+		motor_pwm: motor_pwm {
+			samsung,pins = "gpg0-1";
+			samsung,pin-function = <2>;
+			samsung,pin-pud = <1>;
+			samsung,pin-drv = <0>;
+		};
+	};
+
+	i2c@13830000 {
+		s2mu004-haptic@3A {
+			compatible = "sec,s2mu004-haptic";
+			reg = <0x3A>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&motor_pwm>;
+			
+		};
+	};
+
+	i2c_5:i2c@13880000 {
+		abov@20 {
+			abov,firmware_name = "abov/a96t326_a5y18_can.fw";
+		};
+	};
+};
+

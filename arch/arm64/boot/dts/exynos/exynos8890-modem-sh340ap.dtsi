@@ -1,0 +1,218 @@
+/*
+ * SAMSUNG sh340ap board device tree source
+ *
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ *             http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/* modem_interface_driver: UMTS modem, 2G/3G/4G, Samsung Electronics SH340AP */
+
+/ {
+	mif_pdata {
+		compatible = "sec_modem,modem_pdata";
+		status = "okay";
+
+		interrupts = <0 21 0>, <0 96 0>;
+		samsung,syscon-phandle = <&pmu_system_controller>;
+		gpios = <&gpe4 4 0>, <&gpe4 5 0>, <&gpe4 6 0>, <&gpe4 7 0>;
+
+		mif,int_ap2cp_msg = <0>;
+		mif,int_ap2cp_wakeup = <1>;
+		mif,int_ap2cp_status = <2>;
+		mif,int_ap2cp_active = <3>;
+
+		mif,irq_cp2ap_msg = <0>;
+		mif,irq_cp2ap_wakeup = <1>;
+		mif,irq_cp2ap_status = <2>;
+		mif,irq_cp2ap_perf_req = <3>;
+		mif,irq_cp2ap_active = <4>;
+		mif,irq_cp2ap_perf_req_cpu = <5>;
+		mif,irq_cp2ap_perf_req_mif = <6>;
+		mif,irq_cp2ap_perf_req_int = <7>;
+		mif,irq_cp2ap_pcie_l1ss_disable = <9>;
+
+		mbx_ap2cp_msg = <0>;
+		mbx_cp2ap_msg = <1>;
+		mbx_ap2cp_wakeup = <2>;
+		mbx_cp2ap_wakeup = <3>;
+		mbx_ap2cp_status = <4>;
+		mbx_cp2ap_status = <5>;
+		mbx_ap2cp_active = <6>;
+		mbx_cp2ap_dvfsreq = <7>;
+		mbx_cp2ap_active = <9>;
+		mbx_cp2ap_dvfsreq_cpu = <10>;
+		mbx_cp2ap_dvfsreq_mif = <11>;
+		mbx_cp2ap_dvfsreq_int = <12>;
+		mbx_ap2cp_mif_value = <13>;
+		mbx_ap2cp_sec = <14>;
+		mbx_ap2cp_usec = <15>;
+		mbx_cp2ap_pcie_l1ss_disable = <17>;
+		mbx_ap2cp_lock_value = <31>;
+		mbx_ap2cp_et_dac_cal = <32>;
+		mbx_ap2cp_sys_rev = <33>;
+		mbx_ap2cp_pmic_rev = <35>;
+		mbx_ap2cp_pkg_id = <37>;
+
+		shmem,base = <0xF0000000>;
+		shmem,ipc_offset = <0x8000000>;
+		shmem,ipc_size = <0x800000>;
+		shmem,dump_offset = <0x1000>;
+
+		mif,name = "sh340ap";
+		mif,link_types = <0x80>;	/* LINKDEV_SHMEM */
+		mif,link_name = "SHMEM";
+		mif,use_handover = <0>;
+
+		mif,num_iodevs = <16>;
+		iodevs {
+			io_device_0 {
+				iod,name = "umts_ipc0";
+				iod,id = <245>;
+				iod,format = <0>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "RIL";
+			};
+			io_device_1 {
+				iod,name = "umts_ipc1";
+				iod,id = <246>;
+				iod,format = <0>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "RIL";
+			};
+			io_device_2 {
+				iod,name = "umts_rfs0";
+				iod,id = <41>;
+				iod,format = <1>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "RFS";
+			};
+			io_device_3 {
+				iod,name = "umts_router";
+				iod,id = <21>;
+				iod,format = <1>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "Data Router";
+			};
+			io_device_4 {
+				iod,name = "umts_dm0";
+				iod,id = <81>;
+				iod,format = <1>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "DIAG";
+			};
+			io_device_5 {
+				iod,name = "umts_loopback";
+				iod,id = <82>;
+				iod,format = <1>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "LOOPBACK";
+			};
+			io_device_6 {
+				iod,name = "rmnet0";
+				iod,id = <1>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_7 {
+				iod,name = "rmnet1";
+				iod,id = <2>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_8 {
+				iod,name = "rmnet2";
+				iod,id = <3>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_9 {
+				iod,name = "rmnet3";
+				iod,id = <4>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_10 {
+				iod,name = "rmnet4";
+				iod,id = <5>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_11 {
+				iod,name = "rmnet5";
+				iod,id = <6>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_12 {
+				iod,name = "rmnet6";
+				iod,id = <7>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_13 {
+				iod,name = "rmnet7";
+				iod,id = <8>;
+				iod,format = <1>;
+				iod,io_type = <1>;
+				iod,links = <0x80>;
+				iod,attrs = <0x82>;
+				iod,app = "NET";
+			};
+			io_device_14 {
+				iod,name = "multipdp";
+				iod,id = <0>;
+				iod,format = <3>;
+				iod,io_type = <2>;
+				iod,links = <0x80>;
+				iod,attrs = <0x02>;
+				iod,app = "RIL";
+			};
+			io_device_15 {
+				iod,name = "umts_boot0";
+				iod,id = <241>;
+				iod,format = <4>;
+				iod,io_type = <0>;
+				iod,links = <0x80>;
+				iod,attrs = <0x02>;
+				iod,app = "CBD";
+			};
+		}; /* end of iodevs */
+	}; /* end of mif_pdata */
+};

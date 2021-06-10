@@ -1,0 +1,126 @@
+/*
+ * SAMSUNG EXYNOS7904 board device tree source
+
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+
+#include "exynos7904-gta3xlwifi_common.dtsi"
+#include "exynos7904-gta3xlwifi_eur_open_gpio_03.dtsi"
+#include "ccic-s2mm005_gta3xllte_00.dtsi"
+
+/ {
+	compatible = "samsung,GTA3XLWIFI EUR OPEN 02", "samsung,EXYNOS7904";
+
+	dtbo-hw_rev = <3>;
+    dtbo-hw_rev_end = <3>;
+
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung GTA3XLWIFI EUR OPEN 02 board based on EXYNOS7904";
+			sound {
+				samsung,codec = <&abox &sma1301_amp_r &sma1301_amp_l>;
+
+				samsung,routing =  "VOUTPUT", "ABOX UAIF0 Playback",
+						 "VOUTPUTCALL", "ABOX UAIF2 Playback",
+						 "ABOX UAIF2 Capture", "VINPUTCALL",
+						 "ABOX SPEEDY Capture", "VINPUTFM",
+						 // "SPK", "ABOX UAIF3 Playback",
+						 // "ABOX UAIF3 Capture", "VI";
+						 "SPK", "SPKR Playback-8-001e",
+						 "SPKR Playback-8-001e", "ABOX UAIF3 Playback",
+						 "ABOX UAIF3 Capture", "SPKR Capture-8-001e",
+						 "SPK", "SPKL Playback-8-003e",
+						 "SPKL Playback-8-003e", "ABOX UAIF3 Playback",
+						 "ABOX UAIF3 Capture", "SPKL Capture-8-003e";
+				uaif@3 {
+					cpu {
+						sound-dai = <&abox 16>;
+					};
+					codec {
+						sound-dai = <&sma1301_amp_r 0 &sma1301_amp_l 0>;
+					};
+				};
+			};
+            gps {
+				compatible = "samsung,exynos54xx-bcm4753";
+				gpios = <&gpg2 0 0x1
+					 &gpa0 4 0xf
+					>;
+				status = "okay";
+			};
+
+			i2c@20 {
+				compatible = "i2c-gpio";
+				gpios = <&gpp7 0 0
+						&gpp7 1 0>;
+				i2c-gpio,delay-us = <2>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&grip_i2c>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "okay";
+
+				sx9330_wifi-i2c@28 {
+					compatible = "sx9330_wifi";
+					pinctrl-names = "default";
+					pinctrl-0 = <&grip_wifi_int>;
+					reg = <0x28>;
+					interrupt-parent = <&gpa0>;
+					interrupts = <5 0 0>;
+					sx9330_wifi,nirq-gpio = <&gpa0 5 0>; 
+
+					sx9330,scanperiod_reg = <0x00000032>; /* scanperiod : 102ms */
+					sx9330,gnrlctrl2_reg = <0x00FF0002>;
+					sx9330,afeparamsph0_reg = <0x0000021F>;
+					sx9330,afephph0_reg = <0x3FBB8548>;
+					sx9330,adcfiltph0_reg = <0x0510101D>;
+					sx9330,afeparamsph1_reg = <0x0000082F>;  /* again : 3.3pF, sampling freq : 111.11 khz */
+					sx9330,adcfiltph1_reg = <0x0010B115>;    /* threshold : 15665 */
+					sx9330,avgbfilt_reg = <0x60600C00>;   /* AVGPOSFILT : 1/256, AVGNEGFILT : 1/2 */
+					sx9330,avgafilt_reg = <0x00000000>;
+					sx9330,advdig3_reg = <0x00000000>;
+					sx9330,advdig4_reg = <0x00000000>;
+					sx9330,refcorra_reg = <0x00000000>;
+				};
+			};
+
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&i2c_3 {
+
+	/delete-node/ tfa98xx@34;
+	/delete-node/ tfa98xx@35;
+
+	sma1301_amp_r: sma1301@1e {
+		compatible = "siliconmitus,sma1301";
+		#sound-dai-cells = <1>;
+		stereo-two-chip;
+		reg = <0x1e>;
+		init-vol = <0x32>;
+		pinctrl-names = "default";
+	};
+	sma1301_amp_l: sma1301@3e {
+		compatible = "siliconmitus,sma1301";
+		#sound-dai-cells = <1>;
+		stereo-two-chip;
+		reg = <0x3e>;
+		init-vol = <0x32>;
+		pinctrl-names = "default";
+	};
+};

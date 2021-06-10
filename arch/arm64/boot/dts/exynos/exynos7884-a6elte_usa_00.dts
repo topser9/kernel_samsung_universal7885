@@ -1,0 +1,141 @@
+/*
+ * SAMSUNG UNIVERSAL7885 board device tree source
+ *
+ * Copyright (c) 2013 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+#include "exynos7884-a6elte_common.dtsi"
+#include "exynos7884-a6elte_usa_gpio_00.dtsi"
+#include "exynos7884-a6elte_fingerprint-sensor_00.dtsi"
+
+/ {
+	model = "Samsung A6ELTE VZW rev00 board based on EXYNOS7884";
+	model_info-chip = <7885>;
+	model_info-platform = "android";
+	model_info-subtype = "samsung";
+	model_info-hw_rev = <0>;
+	model_info-hw_rev_end = <2>;
+	compatible = "samsung, A6ELTE VZW rev00", "samsung,Universal7884";
+
+	i2c_4:i2c@13870000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		samsung,i2c-max-bus-freq = <400000>;
+		touchscreen@4b {
+			compatible = "synaptics,rmi4";
+			reg = <0x4b>;
+			pinctrl-names = "default", "on_state", "off_state";
+			pinctrl-0 = <&attn_irq>;
+			pinctrl-1 = <&i2c_on>;
+			pinctrl-2 = <&i2c_off>;
+			synaptics,irq_gpio = <&gpa0 0 0>;
+			synaptics,irq_type = <8200>;
+			synaptics,max_coords = <720 1280>;	/* x y */
+			synaptics,num_lines = <32 18>;		/* rx tx */
+			synaptics,ub-i2c-addr = <0x2c>;
+			synaptics,reset-delay-ms = <150>;
+			synaptics,firmware_name = "tsp_synaptics/td4100_j7pop.fw";
+			synaptics,firmware_name_bl = "tsp_synaptics/td4100_j7pop_recovery.fw";
+		};
+
+		touchscreen@48 {
+			status = "disabled";
+		};
+	};
+
+	i2c@20 {
+		gpios = <&gpc1 6 0 &gpc1 7 0>;
+		touchkey@20 {
+			coreriver,scl-gpio = <&gpc1 7 0>;
+			coreriver,sda-gpio = <&gpc1 6 0>;
+			coreriver,bringup;
+		};
+	};
+
+	i2c_5:i2c@13880000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&i2c5_bus>;
+
+		tmd3725@39 {
+			compatible = "taos,tmd3725";
+			reg = <0x39>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&prox_int>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <4 0 0>;
+			taos,irq_gpio = <&gpa0 4 0x00>;
+			taos,vled_ldo_pin = <&gpg3 1 0x00>;
+			taos,prox_thd_det_hi = <55>;
+			taos,prox_thd_still_det_low = <40>;
+			taos,prox_thd_still_det_hi = <250>;
+			taos,prox_thd_rel_low = <130>;
+			taos,coef_r = <(-830)>;
+			taos,coef_g = <1100>;
+			taos,coef_b = <(-1180)>;
+			taos,coef_c = <1000>;
+			taos,dgf = <842>;
+			taos,cct_coef = <3521>;
+			taos,cct_offset = <2095>;
+		};
+	};
+
+	pinctrl@11CB0000 {
+		grip_int: grip_int {
+			samsung,pins = "gpa0-6";
+			samsung,pin-function = <0xf>;
+			samsung,pin-pud = <0>;
+			samsung,pin-drv = <0>;
+		};
+	};
+
+	pinctrl@139B0000 {
+		grip_ldo: grip_ldo {
+			samsung,pins = "gpg1-6";
+			samsung,pin-function = <1>;
+			samsung,pin-pud = <0>;
+		};
+	};
+
+	/* VIBRATOR */
+	sec_vib {
+		compatible = "sec_vib";
+		sec_vib_pdata {
+			status = "disabled";
+			sec_vib,max_timeout = <10000>;
+			sec_vib,ldo_type = <1>;
+			sec_vib,ldo_en = <&gpp0 3 1>;
+		};
+	};
+
+	hsi2c_8: hsi2c@13980000 {
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-frequency = <100000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hs_i2c8_bus>;
+		
+		a96t3x6@20 {
+			compatible = "a96t3x6";
+			pinctrl-names = "default";
+			pinctrl-0 = <&grip_int &grip_ldo>;
+			reg = <0x20>;
+			interrupt-parent = <&gpa0>;
+			interrupts = <6 0 0>;
+			a96t3x6,irq_gpio = <&gpa0 6 0>;
+			a96t3x6,ldo_en = <&gpg1 6 0>;
+			a96t3x6,fw_path = "abov/a96t346_a6elte.fw";
+			a96t3x6,firmup_cmd = <0x38>;
+		};
+	};
+};

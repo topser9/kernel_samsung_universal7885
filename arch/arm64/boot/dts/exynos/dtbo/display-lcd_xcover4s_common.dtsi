@@ -1,0 +1,105 @@
+/*
+ * SAMSUNG LCD Panel Device Tree Source
+ *
+ * Copyright (c) Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	fragment@lcd {
+		target-path = "/";
+		__overlay__ {
+			decon_board_s6d7aa0: decon_board_s6d7aa0 {
+				gpio_lcd_1p8 = <&gpg1 4 0>;
+				gpio_blic_on = <&gpg2 0 0>;
+				gpio_panel_enp = <&gpg0 1 0>;
+				gpio_panel_enn = <&gpg0 2 0>;
+				gpio_lcd_rst = <&gpa2 5 0>;
+
+				dsim_set_panel_power_early {
+					type =
+					"gpio,high",	"gpio_lcd_1p8",
+					"delay,usleep",	"15000",
+					"gpio,high",	"gpio_blic_on",
+					"delay,usleep",	"5000";
+				};
+				dsim_set_panel_power_enable {
+					type =
+					"gpio,high",	"gpio_panel_enp",
+					"delay,usleep",	"5000",
+					"gpio,high",	"gpio_panel_enn",
+					"delay,usleep",	"10000";
+				};
+				dsim_set_panel_power_disable {
+					type =
+					"gpio,low",	"gpio_lcd_rst",
+					"delay,usleep",	"5000",
+					"gpio,low",	"gpio_panel_enn",
+					"delay,usleep",	"5000",
+					"gpio,low",	"gpio_panel_enp",
+					"delay,usleep",	"10000",
+					"gpio,low",	"gpio_blic_on",
+					"delay,usleep",	"5000",
+					"gpio,low",	"gpio_lcd_1p8";
+				};
+				dsim_reset_panel {
+					type =
+					"gpio,high",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"gpio,low",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"gpio,high",	"gpio_lcd_rst",
+					"delay,usleep",	"5000";
+				};
+			};
+
+			s6d7aa0: s6d7aa0 {
+				mode = <0>; /* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1280>;
+				size = <62 106>;
+				timing,refresh = <60>;
+				timing,h-porch = <164 108 44>;
+				timing,v-porch = <12 16 4>;
+				timing,dsi-hs-clk = <489>;	/* 684.6667 */
+				timing,pms = <4 301 2>;
+				timing,dsi-escape-clk = <16>;
+				mic_en = <0>;		/* 0: Disable, 1: Enable */
+				mic_ratio = <0>;	/* 0: 1/2 mic, 1: 1/3 mic */
+				mic_ver = <0>;		/* 0: mic v1.1, 1: v1.2, 2: v2.0 */
+				type_of_ddi = <0>;	/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;		/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;		/* used DSC count */
+				dsc_slice_num = <0>;	/* count of dsc slice */
+				data_lane = <4>;	/* number of using data lane */
+				vt_compensation = <517>;	/* for underrun detect at command mode */
+				decon_board = <&decon_board_s6d7aa0>;
+			};
+		};
+	};
+};
+
+&dsim_0 {
+	lcd_info = <&s6d7aa0>;
+};
+
+&decon_f {
+	psr_mode = <0>;		/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+	trig_mode = <1>;	/* 0: hw trigger, 1: sw trigger */
+	dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
+};
+
+/* hsi2c_2: hsi2c@138C0000 */
+&hsi2c_2 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	lm3632@11 {
+		compatible = "i2c,lm3632";
+		reg = <0x11>;
+	};
+};
+

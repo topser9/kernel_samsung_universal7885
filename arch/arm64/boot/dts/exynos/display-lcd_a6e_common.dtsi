@@ -1,0 +1,77 @@
+/*
+ * SAMSUNG LCD Panel Device Tree Source
+ *
+ * Copyright (c) Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/ {
+	decon_board_s6e8aa5: decon_board_s6e8aa5 {
+		gpio_det = <&gpa0 1 0x1>;
+
+		gpio_lcd_pwr_en = <&gpg2 6 0>;
+		gpio_lcd_rst = <&gpg1 7 0>;
+
+		dsim_set_panel_power_enable {
+			type =
+			"gpio,high",	"gpio_lcd_pwr_en",
+			"delay,usleep",	"5000";
+		};
+		dsim_set_panel_power_disable {
+			type =
+			"gpio,low",	"gpio_lcd_rst",
+			"delay,usleep",	"1000",
+			"gpio,low",	"gpio_lcd_pwr_en";
+		};
+		dsim_reset_panel {
+			type =
+			"gpio,high",	"gpio_lcd_rst",
+			"delay,usleep",	"5000",
+			"gpio,low",	"gpio_lcd_rst",
+			"delay,usleep",	"5000",
+			"gpio,high",	"gpio_lcd_rst",
+			"delay,usleep",	"10000";
+		};
+	};
+
+	s6e8aa5: s6e8aa5 {
+		mode = <0>;
+		resolution = <720 1480>;
+		size = <62 128>;	/* 62.35 x 128.17 */
+		ddi_type = <1>;
+		timing,refresh = <60>;
+		/* HBP HFP HSW */
+		timing,h-porch = <26 62 2>;
+		/* VBP VFP VSW */
+		timing,v-porch = <10 12 2>;
+		timing,dsi-hs-clk = <498>;
+		timing,dsi-escape-clk = <16>;
+		timing,pms = <3 230 2>;
+		mic_en = <0>;		/* 0: Disable, 1: Enable */
+		mic_ratio = <0>;	/* 0: 1/2 mic, 1: 1/3 mic */
+		mic_ver = <0>;		/* 0: mic v1.1, 1: v1.2, 2: v2.0 */
+		type_of_ddi = <0>;	/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+		dsc_en = <0>;		/* 0: Disable, 1: Enable */
+		dsc_cnt = <0>;		/* used DSC count */
+		dsc_slice_num = <0>;	/* count of dsc slice */
+		data_lane = <4>;	/* number of using data lane */
+
+		vt_compensation = <570>;	/* for difference between wordclk and vclk at video mode */
+		decon_board = <&decon_board_s6e8aa5>;
+	};
+};
+
+&dsim_0 {
+	lcd_info = <&s6e8aa5>;
+};
+
+&decon_f {
+	psr_mode = <0>;		/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+	trig_mode = <1>;	/* 0: hw trigger, 1: sw trigger */
+	dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
+};
+
