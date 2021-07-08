@@ -263,6 +263,33 @@ int cal_dfs_get_rate_asv_table(unsigned int id,
 	for (idx = 0; idx < num_of_entry; idx++) {
 		table[idx].rate = rate[idx];
 		table[idx].volt = volt[idx];
+/*
+		if(table[idx].rate==2496000||rate[idx]==2496000){
+			table[idx].volt=1300000;
+			volt[idx]=1300000;//1143750  all not work
+}
+		if(table[idx].rate==2392000||rate[idx]==2392000)
+			{
+			table[idx].volt=1300000;
+			volt[idx]=1300000;//1143750
+			}
+		if(table[idx].rate==1898000||rate[idx]==1898000){
+			table[idx].volt=1300000;
+			volt[idx]=1300000;
+}
+		if(table[idx].rate==2002000||rate[idx]==2002000){
+			table[idx].volt=1300000;
+			volt[idx]=1300000;
+}
+		if(table[idx].rate==2093000||rate[idx]==2002000){
+			table[idx].volt=1300000;
+			volt[idx]=1300000;
+}
+		if(table[idx].rate==1898000||rate[idx]==1898000){
+			table[idx].volt=1300000;
+			volt[idx]=1300000;
+}
+	pr_info("rate[idx] : %u kHz - volt[idx] : %u Uv- topser99asv\n",rate[idx],volt[idx]);//hope*/
 	}
 
 	return num_of_entry;
@@ -396,3 +423,4 @@ int __init cal_if_init(void *dev)
 
 	return 0;
 }
+
