@@ -788,7 +788,7 @@ static void print_domain_info(struct exynos_cpufreq_domain *domain)
 			domain->id, buf);
 
 	pr_info("CPUFREQ of domain%d boot freq = %d kHz, resume freq = %d kHz\n",
-			domain->id, domain->boot_freq, domain->resume_freq);
+			domain->id, domain->boot_freq, domain->resume_freq);	
 
 	pr_info("CPUFREQ of domain%d max freq : %d kHz, min freq : %d kHz\n",
 			domain->id,
@@ -800,6 +800,7 @@ static void print_domain_info(struct exynos_cpufreq_domain *domain)
 
 	pr_info("CPUFREQ of domain%d table size = %d\n",
 			domain->id, domain->table_size);
+
 
 	for (i = 0; i < domain->table_size; i ++) {
 		if (domain->freq_table[i].frequency == CPUFREQ_ENTRY_INVALID)
@@ -854,6 +855,8 @@ static __init int init_table(struct exynos_cpufreq_domain *domain)
 		else {
 			domain->freq_table[index].frequency = table[index];
 			/* Add OPP table to first cpu of domain */
+			if(table[index]==1794)
+				volt_table[index]=1043750;
 			dev_pm_opp_add(get_cpu_device(cpumask_first(&domain->cpus)),
 					table[index] * 1000, volt_table[index]);
 		}
@@ -866,7 +869,10 @@ static __init int init_table(struct exynos_cpufreq_domain *domain)
 		list_for_each_entry(ufc, &domain->ufc_list, list)
 			ufc->info.freq_table[index].master_freq =
 					domain->freq_table[index].frequency;
+		pr_info("init_table : %u MHz - volt_table  : %u Uv topser99volt\n",
+					table[index],volt_table[index]);
 	}
+
 	domain->freq_table[index].driver_data = index;
 	domain->freq_table[index].frequency = CPUFREQ_TABLE_END;
 
@@ -967,14 +973,30 @@ static int init_constraint_table_ect(struct exynos_cpufreq_domain *domain,
 
 		for (c_index = 0; c_index < ect_domain->num_of_level; c_index++) {
 			/* find row same as frequency */
-			if (freq == ect_domain->level[c_index].main_frequencies) {
-				dm->c.freq_table[index].constraint_freq
-					= ect_domain->level[c_index].sub_frequencies;
+			if (freq == ect_domain->level[c_index].main_frequencies)  {
+				dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies;//main is cpu freq, cons and sub is int
+			//for litte
+			if(domain->id==0)
+			{
+				if(freq==1248000&&ect_domain->level[c_index].sub_frequencies==107000)
+					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=133000;
+			}
+			if(domain->id==1)
+			{
+				if(freq==1768000)
+					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
+				if(freq==1560000)
+					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=267000;
+				if(freq==1352000)
+					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=133000;
+				//if(freq==1144000)
+				//	dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=133000;
+			}
 				valid_row = true;
 				break;
 			}
 		}
-
+pr_info("constraint_table_ect: freq : %u kHz - dm->c.freq_table[index].constraint_freq : %u kHz - topser99\n",freq,dm->c.freq_table[index].constraint_freq);
 		/*
 		 * Due to higher levels of constraint_freq should not be NULL,
 		 * they should be filled with highest value of sub_frequencies of ect
@@ -982,7 +1004,7 @@ static int init_constraint_table_ect(struct exynos_cpufreq_domain *domain,
 		 */
 		if (!valid_row)
 			dm->c.freq_table[index].constraint_freq
-				= ect_domain->level[0].sub_frequencies;
+				= ect_domain->level[0].sub_frequencies;//ect_domain->level[0].sub_frequencies is 533000
 	}
 
 	return 0;
@@ -1014,17 +1036,58 @@ static int init_constraint_table_dt(struct exynos_cpufreq_domain *domain,
 
 		if (freq == CPUFREQ_ENTRY_INVALID)
 			continue;
-
+		// for litte
+		if(freq==1794000||freq==1898000||freq==2002000)
+			dm->c.freq_table[index].constraint_freq=1014000;//stock is 1014000
+		// for big
+		if(freq==2496000||freq==2392000||freq==2288000||freq==2184000||freq==2080000||freq==1976000||freq==1872000)
+			dm->c.freq_table[index].constraint_freq=1794000;
+		if(freq==520000)
+			dm->c.freq_table[index].constraint_freq=546000;
+		if(freq==312000||freq==208000)
+			dm->c.freq_table[index].constraint_freq=420000;
 		for (c_index = 0; c_index < size / 2; c_index++) {
+					
 			/* find row same or nearby frequency */
 			if (freq <= table[c_index].master_freq)
 				dm->c.freq_table[index].constraint_freq
-					= table[c_index].constraint_freq;
-
+					= table[c_index].constraint_freq;//main is cpu freq, cons is mif
+			// for big
+			if(freq==1768000)
+			{
+				dm->c.freq_table[index].constraint_freq=1539000;
+			}
+			if(freq==1664000)
+			{
+				dm->c.freq_table[index].constraint_freq=1539000;
+			}
+			if(freq==1560000)
+			{
+				dm->c.freq_table[index].constraint_freq=1352000;
+			}
+			if(freq==1352000&&dm->c.freq_table[index].constraint_freq==1352000)
+			{
+				dm->c.freq_table[index].constraint_freq=1014000;
+			}
+			if(freq==1144000&&dm->c.freq_table[index].constraint_freq==1014000)
+			{
+				dm->c.freq_table[index].constraint_freq=845000;
+			}
+			if(freq==936000&&table[c_index].constraint_freq==1014000)
+			{
+				dm->c.freq_table[index].constraint_freq=676000;
+			}
+			if(freq==728000)
+			{
+				dm->c.freq_table[index].constraint_freq=546000;
+			}
 			if (freq >= table[c_index].master_freq)
+			{
 				break;
-
+			}
 		}
+		pr_info("constraint_table_dt: freq : %u kHz - dm->c.freq_table[index].constraint_freq : %u kHz- topser99dt\n",freq,dm->c.freq_table[index].constraint_freq);//hope
+
 	}
 
 	kfree(table);
@@ -1111,6 +1174,13 @@ static __init int init_domain(struct exynos_cpufreq_domain *domain,
 
 	domain->boot_freq = cal_dfs_get_boot_freq(domain->cal_id);
 	domain->resume_freq = cal_dfs_get_resume_freq(domain->cal_id);
+	if (domain->id == 0) {
+		domain->boot_freq=domain->max_freq = 1690000; //2002 1898 1794 1690...449 343 208
+		domain->min_freq = 208000;//2002 1898 1794 1690...449 343 208
+	} else if (domain->id == 1) {
+		domain->boot_freq=domain->max_freq = 2184000; //2496 2392 2288 2184....728 520 312 208
+		domain->min_freq = 208000; //2496 2392 2288 2184....728 520 312 208
+	}
 
 	/* Initialize freq boost */
 	if (domain->boost_supported) {
@@ -1307,6 +1377,7 @@ free:
 	return NULL;
 }
 
+
 static int __init exynos_cpufreq_init(void)
 {
 	struct device_node *dn = NULL;
@@ -1368,7 +1439,7 @@ static int __init exynos_cpufreq_init(void)
 		update_freq(domain, domain->old);
 		cpufreq_update_policy(cpumask_first(&domain->cpus));
 	}
-
+	
 	pr_info("Initialized Exynos cpufreq driver\n");
 
 	return ret;
