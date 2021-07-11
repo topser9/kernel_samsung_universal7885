@@ -46,17 +46,32 @@ struct exynos_ufc_req {
 static int last_max_limit = -1;
 static int sse_mode;
 
-unsigned int big_throttle_limit = 0;
-unsigned int little_throttle_limit = 0;
-unsigned int gpu_throttle_limit = 0;
+static unsigned int big_throttle_limit = 0;
+static unsigned int little_throttle_limit = 0;
+static unsigned int gpu_throttle_limit = 0;
+
+int get_big_throttle_limit(void)
+{
+	return big_throttle_limit;
+}
+
+int get_little_throttle_limit(void)
+{
+	return little_throttle_limit;
+}
+
+int get_gpu_throttle_limit(void)
+{
+	return gpu_throttle_limit;
+}
 
 bool is_throttle_limit(unsigned int clipped_freq, int cpu)
 {
 	unsigned int freq = 0;
 	if (cpumask_test_cpu(cpu, cpu_perf_mask)) {
-		freq = big_throttle_limit;
+		freq = get_big_throttle_limit();
 	} else {
-		freq = little_throttle_limit;
+		freq = get_little_throttle_limit();
 	}
 
 	return (clipped_freq < freq);
@@ -504,9 +519,9 @@ static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct attribute *a
 
 	if (!sscanf(buf, "%8d", &input))
 		return -EINVAL;
-
-	if (input < big_throttle_limit && input != -1)
-	     input = big_throttle_limit;
+		
+	if (input < get_big_throttle_limit() && input != -1)
+		input = get_big_throttle_limit();
 
 	last_max_limit = input;
 	cpufreq_max_limit_update(input);
@@ -563,8 +578,8 @@ static ssize_t store_throttle_limit(struct kobject *kobj, struct kobj_attribute 
 	return count;
 }
 
-static struct global_attr cpufreq_table =
-__ATTR(cpufreq_table, 0444 , show_cpufreq_table, NULL);
+static struct kobj_attribute cpufreq_table =
+__ATTR(cpufreq_table, 0444, show_cpufreq_table, NULL);
 static struct kobj_attribute cpufreq_min_limit =
 __ATTR(cpufreq_min_limit, 0644,
 		show_cpufreq_min_limit, store_cpufreq_min_limit);
@@ -575,9 +590,6 @@ static struct kobj_attribute cpufreq_max_limit =
 __ATTR(cpufreq_max_limit, 0644,
 		show_cpufreq_max_limit, store_cpufreq_max_limit);
 static struct kobj_attribute execution_mode_change =
-__ATTR(execution_mode_change, 0644,
-		show_execution_mode_change, store_execution_mode_change);
-static struct global_attr execution_mode_change =
 __ATTR(execution_mode_change, 0644,
 		show_execution_mode_change, store_execution_mode_change);
 static struct kobj_attribute throttle_limit =

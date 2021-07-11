@@ -6,13 +6,24 @@
 #ifndef __THROTTLE_LIMIT_H__
 #define __THROTTLE_LIMIT_H__
 
-extern unsigned int big_throttle_limit;
-extern unsigned int little_throttle_limit;
-extern unsigned int gpu_throttle_limit;
-
 #ifdef CONFIG_ARM_EXYNOS_ACME
+extern int get_big_throttle_limit(void);
+extern int get_little_throttle_limit(void);
+extern int get_gpu_throttle_limit(void);
 extern bool is_throttle_limit(unsigned int clipped_freq, int cpu);
 #else
+	int get_big_throttle_limit(void)
+{
+	return 0;
+}
+int get_little_throttle_limit(void)
+{
+	return 0;
+}
+int get_gpu_throttle_limit(void)
+{
+	return 0;
+}
 static inline bool is_throttle_limit(unsigned int clipped_freq, int cpu)
 {
 	return false;
