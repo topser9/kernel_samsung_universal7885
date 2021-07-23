@@ -556,6 +556,33 @@ static int ect_parse_ap_thermal_function(int parser_version, void *address, stru
 		ect_parse_integer(&address, &range->lower_bound_temperature);
 		ect_parse_integer(&address, &range->upper_bound_temperature);
 		ect_parse_integer(&address, &range->max_frequency);
+		//for big
+		if(range->lower_bound_temperature==20&&range->max_frequency==2184000)
+			range->max_frequency=2288000;
+		if(range->lower_bound_temperature==76&&range->max_frequency==1768000)
+			range->max_frequency=2184000;
+		if(range->lower_bound_temperature==81&&range->max_frequency==1768000)
+			range->max_frequency=2080000;
+		if(range->lower_bound_temperature==86&&range->max_frequency==1560000)
+			range->max_frequency=1872000;
+		if(range->lower_bound_temperature==91&&range->max_frequency==728000)
+			range->max_frequency=1768000;
+		//for litte
+		if(range->lower_bound_temperature==20&&range->max_frequency==1690000)
+			range->max_frequency=1794000; //
+		if(range->lower_bound_temperature==76&&range->max_frequency==1690000)
+			range->max_frequency=1690000;
+		if(range->lower_bound_temperature==81&&range->max_frequency==1690000)
+			range->max_frequency=1586000;
+		if(range->lower_bound_temperature==86&&range->max_frequency==1586000)
+			range->max_frequency=1482000;
+		//for gpu
+		if(range->lower_bound_temperature==20&&range->max_frequency==1100000)
+			range->max_frequency=1300000;
+		if(range->lower_bound_temperature==76&&range->max_frequency==1100000)
+			range->max_frequency=1200000;
+		if(range->lower_bound_temperature==81&&range->max_frequency==1100000)
+			range->max_frequency=1100000;
 		ect_parse_integer(&address, &range->sw_trip);
 		ect_parse_integer(&address, &range->flag);
 	}
@@ -1657,6 +1684,7 @@ static int ect_dump_ap_thermal(struct seq_file *s, void *data)
 			seq_printf(s, "\t\t\t[SW TRIP] : %u\n", range->sw_trip);
 			seq_printf(s, "\t\t\t[FLAG] : %u\n", range->flag);
 		}
+		pr_info("range->max_frequency : %u kHz - lower : %u upper : %u- topser99\n",range->max_frequency,range->lower_bound_temperature,range->upper_bound_temperature);//hope
 	}
 
 	return 0;
@@ -1775,9 +1803,53 @@ static int ect_dump_minlock(struct seq_file *s, void *data)
 		seq_printf(s, "\t\t[DOMAIN NAME] : %s\n", domain->domain_name);
 
 		for (j = 0; j < domain->num_of_level; ++j) {
+			//for big
+			if (i==0){
+			if(domain->level[j].main_frequencies==1768000)
+				domain->level[j].sub_frequencies=533000; 
+			/*if(domain->level[j].main_frequencies==1664000)
+				domain->level[j].sub_frequencies=333000; 
+			if(domain->level[j].main_frequencies==1560000) 
+				domain->level[j].sub_frequencies=267000;
+			if(domain->level[j].main_frequencies==1352000) 
+				domain->level[j].sub_frequencies=107000; */
+			}
+			//for litte
+			//if (i==1){
+		//	if(domain->level[j].main_frequencies==1352000) 
+			//	domain->level[j].sub_frequencies=333000; //267
+			//if(domain->level[j].main_frequencies==1248000)
+			//	domain->level[j].sub_frequencies=107000; //107
+			//if(domain->level[j].main_frequencies==1144000) 
+			//	domain->level[j].sub_frequencies=133000; //107
+			//}
+			//for gpu
+			if (i==2){
+			if(domain->level[j].main_frequencies==1001000)
+				domain->level[j].sub_frequencies=533000; //333
+			if(domain->level[j].main_frequencies==845000) 
+				domain->level[j].sub_frequencies=333000;//107
+			if(domain->level[j].main_frequencies==676000) 
+				domain->level[j].sub_frequencies=267000;//107
+			if(domain->level[j].main_frequencies==545000)
+				domain->level[j].sub_frequencies=107000;//107
+			if(domain->level[j].main_frequencies==450000)
+				domain->level[j].sub_frequencies=107000;//107
+			if(domain->level[j].main_frequencies==343000)
+				domain->level[j].sub_frequencies=107000;//107
+			}
+			//for mif
+			if (i==3){
+			if(domain->level[j].main_frequencies==2093000||domain->level[j].main_frequencies==2002000||domain->level[j].main_frequencies==1794000) //same
+				domain->level[j].sub_frequencies=533000;//533
+			if(domain->level[j].main_frequencies==1352000) 
+				domain->level[j].sub_frequencies=267000; //107
+			}
 			seq_printf(s, "\t\t\t[Frequency] : (MAIN)%u, (SUB)%u\n",
 					domain->level[j].main_frequencies,
 					domain->level[j].sub_frequencies);
+			//pr_info("Frequency : %u kHz - SUB : %u kHz topser99\n",
+			//		domain->level[j].main_frequencies,domain->level[j].sub_frequencies);
 		}
 	}
 
