@@ -41,7 +41,14 @@
 #endif
 
 #include "device/mali_kbase_device.h"
-
+#include <linux/sysfs_helpers.h>
+#ifdef CONFIG_SOC_EXYNOS7885
+#define GPU_MAX_VOLT		1100000
+#define GPU_MIN_VOLT		300000
+#define GPU_VOLT_STEP		6250
+#else
+#error "Please define gpu voltage ranges for current SoC."
+#endif
 extern struct kbase_device *pkbdev;
 
 int gpu_pmqos_dvfs_min_lock(int level)
@@ -247,7 +254,72 @@ static ssize_t show_asv_table(struct device *dev, struct device_attribute *attr,
 
 	return ret;
 }
+static ssize_t show_volt_table(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct exynos_context *platform = (struct exynos_context *)pkbdev->platform_context;
+	ssize_t count = 0, pr_len;
+	int i, max, min;
 
+	if (!platform)
+		return -ENODEV;
+
+	max = gpu_dvfs_get_stock_level(platform->gpu_max_clock);
+	min = gpu_dvfs_get_stock_level(platform->gpu_min_clock);
+	pr_len = (size_t)((PAGE_SIZE - 2) / (min-max));
+
+	for (i = max; i <= min; i++) {
+		count += snprintf(&buf[count], pr_len, "%d %d\n",
+				platform->table[i].clock,
+				platform->table[i].voltage);
+	}
+
+	return count;
+}
+
+static ssize_t set_volt_table(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct exynos_context *platform = (struct exynos_context *)pkbdev->platform_context;
+	int max = gpu_dvfs_get_stock_level(platform->gpu_max_clock);
+	int min = gpu_dvfs_get_stock_level(platform->gpu_min_clock);
+	int i, tokens, rest, target;
+	int t[min - max];
+	unsigned long flags;
+	if ((tokens = read_into((int*)&t, min-max, buf, count)) < 0)
+		return -EINVAL;
+
+	target = -1;
+	if (tokens == 2) {
+		for (i = max; i <= min; i++) {
+			if (t[0] == platform->table[i].clock) {
+				target = i;
+				break;
+			}
+		}
+	}
+
+	spin_lock_irqsave(&platform->gpu_dvfs_spinlock, flags);
+
+	if (tokens == 2 && target > -1) {
+		if ((rest = t[1] % GPU_VOLT_STEP) != 0)
+			t[1] += GPU_VOLT_STEP - rest;
+
+		sanitize_min_max(t[1], GPU_MIN_VOLT, GPU_MAX_VOLT);
+		platform->table[target].voltage = t[1];
+	} else {
+		for (i = 0; i < tokens; i++) {
+			if ((rest = t[i] % GPU_VOLT_STEP) != 0)
+				t[i] += GPU_VOLT_STEP - rest;
+
+			sanitize_min_max(t[i], GPU_MIN_VOLT, GPU_MAX_VOLT);
+			platform->table[i + max].voltage = t[i];
+		}
+	}
+
+	//ipa_update();
+	spin_unlock_irqrestore(&platform->gpu_dvfs_spinlock, flags);
+
+	return count;
+}
 #ifdef CONFIG_MALI_DVFS
 static int gpu_get_dvfs_table(struct exynos_context *platform, char *buf, size_t buf_size)
 {
@@ -1439,16 +1511,17 @@ DEVICE_ATTR(clock, S_IRUGO|S_IWUSR, show_clock, set_clock);
 DEVICE_ATTR(vol, S_IRUGO, show_vol, NULL);
 DEVICE_ATTR(power_state, S_IRUGO, show_power_state, NULL);
 DEVICE_ATTR(asv_table, S_IRUGO, show_asv_table, NULL);
+DEVICE_ATTR(volt_table, S_IRUGO|S_IWUSR, show_volt_table, set_volt_table);
 DEVICE_ATTR(dvfs_table, S_IRUGO, show_dvfs_table, NULL);
 DEVICE_ATTR(time_in_state, S_IRUGO|S_IWUSR, show_time_in_state, set_time_in_state);
 DEVICE_ATTR(utilization, S_IRUGO, show_utilization, NULL);
 DEVICE_ATTR(perf, S_IRUGO, show_perf, NULL);
 #ifdef CONFIG_MALI_DVFS
-DEVICE_ATTR(dvfs, S_IRUGO|S_IWUSR, show_dvfs, set_dvfs);
+DEVICE_ATTR(dvfs, S_IRUGO, show_dvfs, NULL);
 DEVICE_ATTR(dvfs_governor, S_IRUGO|S_IWUSR, show_governor, set_governor);
 DEVICE_ATTR(dvfs_max_lock_status, S_IRUGO, show_max_lock_status, NULL);
 DEVICE_ATTR(dvfs_min_lock_status, S_IRUGO, show_min_lock_status, NULL);
-DEVICE_ATTR(dvfs_max_lock, S_IRUGO|S_IWUSR, show_max_lock_dvfs, set_max_lock_dvfs);
+DEVICE_ATTR(dvfs_max_lock, S_IRUGO, show_max_lock_dvfs, NULL);
 DEVICE_ATTR(dvfs_min_lock, S_IRUGO|S_IWUSR, show_min_lock_dvfs, set_min_lock_dvfs);
 DEVICE_ATTR(down_staycount, S_IRUGO|S_IWUSR, show_down_staycount, set_down_staycount);
 DEVICE_ATTR(highspeed_clock, S_IRUGO|S_IWUSR, show_highspeed_clock, set_highspeed_clock);
@@ -2051,7 +2124,10 @@ int gpu_create_sysfs_file(struct device *dev)
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [asv_table]\n");
 		goto out;
 	}
-
+	if (device_create_file(dev, &dev_attr_volt_table)) {
+		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [volt_table]\n");
+		goto out;
+	}
 	if (device_create_file(dev, &dev_attr_dvfs_table)) {
 		GPU_LOG(DVFS_ERROR, DUMMY, 0u, 0u, "couldn't create sysfs file [dvfs_table]\n");
 		goto out;
@@ -2228,6 +2304,7 @@ void gpu_remove_sysfs_file(struct device *dev)
 	device_remove_file(dev, &dev_attr_clock);
 	device_remove_file(dev, &dev_attr_vol);
 	device_remove_file(dev, &dev_attr_power_state);
+device_remove_file(dev, &dev_attr_volt_table);
 	device_remove_file(dev, &dev_attr_asv_table);
 	device_remove_file(dev, &dev_attr_dvfs_table);
 	device_remove_file(dev, &dev_attr_time_in_state);
