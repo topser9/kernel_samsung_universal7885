@@ -500,6 +500,11 @@ static int devfreq_notifier_call(struct notifier_block *nb, unsigned long type,
 static void _remove_devfreq(struct devfreq *devfreq)
 {
 	mutex_lock(&devfreq_list_lock);
+	if (IS_ERR(find_device_devfreq(devfreq->dev.parent))) {
+		mutex_unlock(&devfreq_list_lock);
+		dev_warn(&devfreq->dev, "releasing devfreq which doesn't exist\n");
+		return;
+	}
 	list_del(&devfreq->node);
 	mutex_unlock(&devfreq_list_lock);
 
@@ -992,7 +997,30 @@ static ssize_t target_freq_show(struct device *dev,
 {
 	return sprintf(buf, "%lu\n", to_devfreq(dev)->previous_freq);
 }
-static DEVICE_ATTR_RO(target_freq);
+
+
+static ssize_t target_freq_store(struct device *dev,
+					  struct device_attribute *attr,
+					  const char *buf, size_t count)
+{
+	struct devfreq *devfreq = to_devfreq(dev);
+	unsigned int freq;
+	int ret;
+
+	if (!devfreq->governor)
+		return -EINVAL;
+
+	ret = sscanf(buf, "%u", &freq);
+	if (ret != 1)
+		return -EINVAL;
+
+	devfreq->previous_freq = freq;
+
+	ret = count;
+
+	return ret;
+}
+static DEVICE_ATTR_RW(target_freq);
 
 static ssize_t polling_interval_show(struct device *dev,
 				     struct device_attribute *attr, char *buf)
@@ -1027,19 +1055,51 @@ static ssize_t min_freq_show(struct device *dev, struct device_attribute *attr,
 {
 	return sprintf(buf, "%lu\n", to_devfreq(dev)->min_freq);
 }
-static DEVICE_ATTR_RO(min_freq);
 
 static ssize_t max_freq_show(struct device *dev, struct device_attribute *attr,
 			     char *buf)
 {
 	return sprintf(buf, "%lu\n", to_devfreq(dev)->max_freq);
 }
-static DEVICE_ATTR_RO(max_freq);
+#define store_one(name)						\
+static ssize_t name##_store					\
+(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)	\
+{								\
+	struct devfreq *devfreq = to_devfreq(dev);	\
+	unsigned int freq;	\
+	int ret;	\
+	\
+	if (!devfreq->governor)	\
+		return -EINVAL;	\
+	\
+	ret = sscanf(buf, "%u", &freq);	\
+	if (ret != 1)	\
+		return -EINVAL;	\
+	\
+	devfreq->name = freq; \
+	\
+	mutex_lock(&devfreq->lock);	\
+	ret = update_devfreq(devfreq);	\
+	mutex_unlock(&devfreq->lock);	\
+	\
+	if (ret && ret != -EAGAIN)	\
+		return ret;	\
+	\
+	ret = count;	\
+	\
+	return ret;	\
+}
+store_one(min_freq);
+store_one(max_freq);
+
+static DEVICE_ATTR_RW(min_freq);
+static DEVICE_ATTR_RW(max_freq);
 
 static ssize_t available_frequencies_show(struct device *d,
 					  struct device_attribute *attr,
 					  char *buf)
 {
+	
 	struct devfreq *df = to_devfreq(d);
 	struct device *dev = df->dev.parent;
 	struct dev_pm_opp *opp;
@@ -1067,7 +1127,54 @@ static ssize_t available_frequencies_show(struct device *d,
 	return count;
 }
 static DEVICE_ATTR_RO(available_frequencies);
+static ssize_t volt_show(struct device *d,
+					  struct device_attribute *attr,
+					  char *buf)
+{
+	struct exynos_devfreq_data *data;
+	struct devfreq *df = to_devfreq(d);
+	struct device *dev = df->dev.parent;
+	struct dev_pm_opp *opp;
+	u32 volt2;
+	ssize_t count = 0;
+	unsigned long freq = 0;
+	int i=0;
+	rcu_read_lock();
+/*
+	for (i = 0; i < data->max_state; i++) {
+		freq = data->opp_list[i].freq;
+		volt = data->opp_list[i].volt;
+		
+		data->devfreq_profile.freq_table[i] = freq;
 
+		ret = dev_pm_opp_add(data->dev, freq, volt);
+		if (ret) {
+			dev_err(data->dev, "failed to add opp entries %uKhz\n", freq);
+			return ret;
+		} else {
+			dev_info(data->dev, "DEVFREQ : %8uKhz, %8uuV\n", freq, volt);
+		}*/
+	do {
+		volt2 = data->opp_list[i].volt;
+		opp = dev_pm_opp_find_freq_ceil(dev, &freq);
+		if (IS_ERR(opp))
+			break;
+
+		count += scnprintf(&buf[count], (PAGE_SIZE - count - 2),
+				   "%lu %d\n", freq,volt2);
+		freq++;i++;
+	} while (1);
+	rcu_read_unlock();
+
+	/* Truncate the trailing space */
+	if (count)
+		count--;
+
+	count += sprintf(&buf[count], "\n");
+
+	return count;
+}
+static DEVICE_ATTR_RO(volt);
 static ssize_t trans_stat_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
@@ -1146,6 +1253,7 @@ static struct attribute *devfreq_attrs[] = {
 	&dev_attr_max_freq.attr,
 	&dev_attr_trans_stat.attr,
 	&dev_attr_time_in_state.attr,
+	&dev_attr_volt.attr,
 	NULL,
 };
 ATTRIBUTE_GROUPS(devfreq);
