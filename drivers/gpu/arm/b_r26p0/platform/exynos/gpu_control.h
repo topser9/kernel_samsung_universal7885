@@ -64,8 +64,8 @@ int gpu_disable_dvs(struct exynos_context *platform);
 int gpu_inter_frame_power_on(struct exynos_context *platform);
 int gpu_inter_frame_power_off(struct exynos_context *platform);
 
-#ifdef CONFIG_MALI_ASV_CALIBRATION_SUPPORT
 int gpu_control_power_policy_set(struct kbase_device *kbdev, const char *buf);
+#ifdef CONFIG_MALI_ASV_CALIBRATION_SUPPORT
 int gpu_asv_calibration_start(void);
 #endif
 
