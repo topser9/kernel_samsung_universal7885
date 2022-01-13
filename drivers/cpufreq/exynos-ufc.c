@@ -46,9 +46,9 @@ struct exynos_ufc_req {
 static int last_max_limit = -1;
 static int sse_mode;
 
-static unsigned int big_throttle_limit = 0;
-static unsigned int little_throttle_limit = 0;
-static unsigned int gpu_throttle_limit = 0;
+unsigned int big_throttle_limit = 2392000;
+unsigned int little_throttle_limit = 1794000;
+unsigned int gpu_throttle_limit = 1300000;
 
 int get_big_throttle_limit(void)
 {
@@ -79,7 +79,7 @@ bool is_throttle_limit(unsigned int clipped_freq, int cpu)
 EXPORT_SYMBOL(is_throttle_limit);
 
 static ssize_t show_cpufreq_table(struct kobject *kobj,
-				struct kobj_attribute *attr, char *buf)
+				struct kobj_kobj_attribute *attr, char *buf)
 {
 	struct list_head *domains = get_domain_list();
 	struct exynos_cpufreq_domain *domain;
@@ -109,7 +109,7 @@ static ssize_t show_cpufreq_table(struct kobject *kobj,
 }
 
 static ssize_t show_cpufreq_min_limit(struct kobject *kobj,
-				struct kobj_attribute *attr, char *buf)
+				struct kobj_kobj_attribute *attr, char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%d\n", ufc_req.last_min_input);
 }
@@ -139,7 +139,7 @@ static inline void control_hmp_boost(bool enable) {}
 #endif
 
 static ssize_t store_cpufreq_min_limit(struct kobject *kobj,
-				struct kobj_attribute *attr, const char *buf,
+				struct kobj_kobj_attribute *attr, const char *buf,
 				size_t count)
 {
 	struct list_head *domains = get_domain_list();
@@ -192,14 +192,14 @@ static ssize_t store_cpufreq_min_limit(struct kobject *kobj,
 		scale++;
 
 		if (set_limit) {
-			req_limit_freq = min(req_limit_freq, (unsigned int)cal_dfs_get_max_freq(domain->cal_id));
+			req_limit_freq = min(req_limit_freq, domain->max_freq);
 			pm_qos_update_request(&domain->user_min_qos_req, req_limit_freq);
 			set_limit = false;
 			continue;
 		}
 
 		if (set_max) {
-			unsigned int qos = cal_dfs_get_max_freq(domain->cal_id);
+			unsigned int qos = domain->max_freq;
 
 			if (domain->user_default_qos)
 				qos = domain->user_default_qos;
@@ -244,7 +244,7 @@ static ssize_t store_cpufreq_min_limit(struct kobject *kobj,
 				set_limit = true;
 		}
 
-		freq = min(freq, (unsigned int)cal_dfs_get_max_freq(domain->cal_id));
+		freq = min(freq, domain->max_freq);
 		pm_qos_update_request(&domain->user_min_qos_req, freq);
 
 		/*
@@ -263,13 +263,13 @@ static ssize_t store_cpufreq_min_limit(struct kobject *kobj,
 }
 
 static ssize_t show_cpufreq_min_limit_wo_boost(struct kobject *kobj,
-		struct kobj_attribute *attr, char *buf)
+		struct kobj_kobj_attribute *attr, char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%d\n", ufc_req.last_min_wo_boost_input);
 }
 
 static ssize_t store_cpufreq_min_limit_wo_boost(struct kobject *kobj,
-				struct kobj_attribute *attr, const char *buf,
+				struct kobj_kobj_attribute *attr, const char *buf,
 				size_t count)
 {
 	struct list_head *domains = get_domain_list();
@@ -322,14 +322,14 @@ static ssize_t store_cpufreq_min_limit_wo_boost(struct kobject *kobj,
 		scale++;
 
 		if (set_limit) {
-			req_limit_freq = min(req_limit_freq, (unsigned int)cal_dfs_get_max_freq(domain->cal_id));
+			req_limit_freq = min(req_limit_freq, domain->max_freq);
 			pm_qos_update_request(&domain->user_min_qos_req, req_limit_freq);
 			set_limit = false;
 			continue;
 		}
 
 		if (set_max) {
-			unsigned int qos = cal_dfs_get_max_freq(domain->cal_id);
+			unsigned int qos = domain->max_freq;
 
 			if (domain->user_default_qos)
 				qos = domain->user_default_qos;
@@ -373,7 +373,7 @@ static ssize_t store_cpufreq_min_limit_wo_boost(struct kobject *kobj,
 				set_limit = true;
 		}
 
-		freq = min(freq, (unsigned int)cal_dfs_get_max_freq(domain->cal_id));
+		freq = min(freq, domain->max_freq);
 		pm_qos_update_request(&domain->user_min_qos_wo_boost_req, freq);
 
 		set_max = true;
@@ -384,7 +384,7 @@ static ssize_t store_cpufreq_min_limit_wo_boost(struct kobject *kobj,
 }
 
 static ssize_t show_cpufreq_max_limit(struct kobject *kobj,
-				struct kobj_attribute *attr, char *buf)
+				struct kobj_kobj_attribute *attr, char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%d\n", ufc_req.last_max_input);
 }
@@ -512,17 +512,19 @@ static void cpufreq_max_limit_update(int input_freq)
 	}
 }
 
-static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct attribute *attr,
+
+static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct kobj_kobj_attribute *attr,
 					const char *buf, size_t count)
 {
 	int input;
 
-	if (!sscanf(buf, "%8d", &input))
+	if (sscanf(buf, "%8d", &input) < 1)
 		return -EINVAL;
 		
 	if (input < get_big_throttle_limit() && input != -1)
 		input = get_big_throttle_limit();
 
+	ufc_req.last_max_input = input;
 	last_max_limit = input;
 	cpufreq_max_limit_update(input);
 
@@ -530,18 +532,18 @@ static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct attribute *a
 }
 
 static ssize_t show_execution_mode_change(struct kobject *kobj,
-				struct attribute *attr, char *buf)
+				struct kobj_kobj_attribute *attr, char *buf)
 {
-	return snprintf(buf, 10, "%d\n",sse_mode);
+	return snprintf(buf, 10, "%d\n", sse_mode);
 }
 
-static ssize_t store_execution_mode_change(struct kobject *kobj, struct attribute *attr,
+static ssize_t store_execution_mode_change(struct kobject *kobj, struct kobj_kobj_attribute *attr,
 					const char *buf, size_t count)
 {
 	int input;
 	int prev_mode;
 
-	if (!sscanf(buf, "%8d", &input))
+	if (sscanf(buf, "%8d", &input) < 1)
 		return -EINVAL;
 
 	prev_mode = sse_mode;
@@ -555,20 +557,18 @@ static ssize_t store_execution_mode_change(struct kobject *kobj, struct attribut
 	return count;
 }
 
-static struct kobj_attribute cpufreq_table =
-__ATTR(cpufreq_table, 0444, show_cpufreq_table, NULL);
 static ssize_t show_throttle_limit(struct kobject *kobj,
-				struct kobj_attribute *attr, char *buf)
+				struct kobj_kobj_attribute *attr, char *buf)
 {
-	return snprintf(buf, 24, "%u:%u:%u", big_throttle_limit, little_throttle_limit, gpu_throttle_limit);
+	return snprintf(buf, 24, "%u:%u:%u", big_throttle_limit, little_throttle_limit,gpu_throttle_limit);
 }
 
-static ssize_t store_throttle_limit(struct kobject *kobj, struct kobj_attribute *attr,
+static ssize_t store_throttle_limit(struct kobject *kobj, struct kobj_kobj_attribute *attr,
 					const char *buf, size_t count)
 {
 	unsigned int big_throttle, little_throttle, gpu_throttle;
 
-	if (sscanf(buf, "%u:%u:%u", &big_throttle, &little_throttle, &gpu_throttle) != 3)
+	if (sscanf(buf, "%u:%u:%u", &big_throttle, &little_throttle) != 3)
 		return -EINVAL;
 
 	big_throttle_limit = big_throttle;
