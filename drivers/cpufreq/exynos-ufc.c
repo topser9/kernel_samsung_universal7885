@@ -33,6 +33,7 @@ struct exynos_ufc_req {
 	.last_max_input = -1,
 };
 
+#define SUSTAINABLE_FREQ 1794000
 /*********************************************************************
  *                          SYSFS INTERFACES                         *
  *********************************************************************/
@@ -495,16 +496,17 @@ static void cpufreq_max_limit_update(int input_freq)
 	}
 }
 
-
-static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct kobj_attribute *attr,
+static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct attribute *attr,
 					const char *buf, size_t count)
 {
 	int input;
 
-	if (sscanf(buf, "%8d", &input) < 1)
+	if (!sscanf(buf, "%8d", &input))
 		return -EINVAL;
 
-	ufc_req.last_max_input = input;
+	if (input < SUSTAINABLE_FREQ && input != -1)
+		input = SUSTAINABLE_FREQ;
+
 	last_max_limit = input;
 	cpufreq_max_limit_update(input);
 
@@ -512,18 +514,18 @@ static ssize_t store_cpufreq_max_limit(struct kobject *kobj, struct kobj_attribu
 }
 
 static ssize_t show_execution_mode_change(struct kobject *kobj,
-				struct kobj_attribute *attr, char *buf)
+				struct attribute *attr, char *buf)
 {
-	return snprintf(buf, 10, "%d\n", sse_mode);
+	return snprintf(buf, 10, "%d\n",sse_mode);
 }
 
-static ssize_t store_execution_mode_change(struct kobject *kobj, struct kobj_attribute *attr,
+static ssize_t store_execution_mode_change(struct kobject *kobj, struct attribute *attr,
 					const char *buf, size_t count)
 {
 	int input;
 	int prev_mode;
 
-	if (sscanf(buf, "%8d", &input) < 1)
+	if (!sscanf(buf, "%8d", &input))
 		return -EINVAL;
 
 	prev_mode = sse_mode;
