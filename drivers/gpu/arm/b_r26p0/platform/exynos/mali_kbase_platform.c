@@ -294,7 +294,7 @@ static int gpu_dvfs_update_config_data_from_dt(struct kbase_device *kbdev)
 	gpu_update_config_data_int(np, "gpu_voltage_offset_margin", &platform->gpu_default_vol_margin);
 	gpu_update_config_data_bool(np, "gpu_tmu_control", &platform->tmu_status);
 	if (platform->tmu_status==1)
-		platform->tmu_status=0;
+		platform->tmu_status=1;
 	gpu_update_config_data_int(np, "gpu_temp_throttling_level_num", &of_data_int);
 	if (of_data_int == TMU_LOCK_CLK_END)
 		gpu_update_config_data_int_array(np, "gpu_temp_throttling", platform->tmu_lock_clk, TMU_LOCK_CLK_END);
