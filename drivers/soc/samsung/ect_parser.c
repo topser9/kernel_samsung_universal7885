@@ -1803,53 +1803,129 @@ static int ect_dump_minlock(struct seq_file *s, void *data)
 		seq_printf(s, "\t\t[DOMAIN NAME] : %s\n", domain->domain_name);
 
 		for (j = 0; j < domain->num_of_level; ++j) {
-			//for big
+			// dvfs_cpucl0
 			if (i==0){
+			if(domain->level[j].main_frequencies==2496000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==2392000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==2288000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==2184000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==2080000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1976000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1872000) 
+				domain->level[j].sub_frequencies=533000;
 			if(domain->level[j].main_frequencies==1768000)
-				domain->level[j].sub_frequencies=533000; 
-			/*if(domain->level[j].main_frequencies==1664000)
-				domain->level[j].sub_frequencies=333000; 
+				domain->level[j].sub_frequencies=333000;
+			if(domain->level[j].main_frequencies==1664000) 
+				domain->level[j].sub_frequencies=333000;
 			if(domain->level[j].main_frequencies==1560000) 
 				domain->level[j].sub_frequencies=267000;
-			if(domain->level[j].main_frequencies==1352000) 
-				domain->level[j].sub_frequencies=107000; */
+			if(domain->level[j].main_frequencies==1352000)
+				domain->level[j].sub_frequencies=133000;
+			if(domain->level[j].main_frequencies==1144000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==936000)
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==728000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==520000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==312000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==208000) 
+				domain->level[j].sub_frequencies=107000;
 			}
-			//for litte
-			//if (i==1){
-		//	if(domain->level[j].main_frequencies==1352000) 
-			//	domain->level[j].sub_frequencies=333000; //267
-			//if(domain->level[j].main_frequencies==1248000)
-			//	domain->level[j].sub_frequencies=107000; //107
-			//if(domain->level[j].main_frequencies==1144000) 
-			//	domain->level[j].sub_frequencies=133000; //107
-			//}
-			//for gpu
-			if (i==2){
-			if(domain->level[j].main_frequencies==1001000)
-				domain->level[j].sub_frequencies=533000; //333
-			if(domain->level[j].main_frequencies==845000) 
-				domain->level[j].sub_frequencies=333000;//107
-			if(domain->level[j].main_frequencies==676000) 
-				domain->level[j].sub_frequencies=267000;//107
-			if(domain->level[j].main_frequencies==545000)
-				domain->level[j].sub_frequencies=107000;//107
-			if(domain->level[j].main_frequencies==450000)
-				domain->level[j].sub_frequencies=107000;//107
+			// dvfs_cpucl1
+			if (i==1){
+			if(domain->level[j].main_frequencies==2002000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1898000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1794000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1690000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1586000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1482000)
+				domain->level[j].sub_frequencies=333000;
+			if(domain->level[j].main_frequencies==1352000) 
+				domain->level[j].sub_frequencies=267000;
+			if(domain->level[j].main_frequencies==1248000) 
+				domain->level[j].sub_frequencies=133000;
+			if(domain->level[j].main_frequencies==1144000)
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==1014000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==902000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==839000)
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==757000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==676000)
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==546000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==449000) 
+				domain->level[j].sub_frequencies=107000;
 			if(domain->level[j].main_frequencies==343000)
-				domain->level[j].sub_frequencies=107000;//107
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==208000) 
+				domain->level[j].sub_frequencies=107000;
 			}
-			//for mif
+			// dvfs_g3d
+			if (i==2){
+			if(domain->level[j].main_frequencies==1300000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1200000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1100000)
+				domain->level[j].sub_frequencies=333000;
+			if(domain->level[j].main_frequencies==1001000) 
+				domain->level[j].sub_frequencies=267000;
+			if(domain->level[j].main_frequencies==845000) 
+				domain->level[j].sub_frequencies=133000;
+			if(domain->level[j].main_frequencies==676000)
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==545000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==450000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==343000)
+				domain->level[j].sub_frequencies=107000;
+			}
+			// dvfs_mif
 			if (i==3){
-			if(domain->level[j].main_frequencies==2093000||domain->level[j].main_frequencies==2002000||domain->level[j].main_frequencies==1794000) //same
-				domain->level[j].sub_frequencies=533000;//533
+			if(domain->level[j].main_frequencies==2093000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==2002000) 
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1794000)
+				domain->level[j].sub_frequencies=533000;
+			if(domain->level[j].main_frequencies==1539000) 
+				domain->level[j].sub_frequencies=333000;
 			if(domain->level[j].main_frequencies==1352000) 
-				domain->level[j].sub_frequencies=267000; //107
+				domain->level[j].sub_frequencies=267000;
+			if(domain->level[j].main_frequencies==1014000) 
+				domain->level[j].sub_frequencies=133000;
+			if(domain->level[j].main_frequencies==845000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==676000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==546000) 
+				domain->level[j].sub_frequencies=107000;
+			if(domain->level[j].main_frequencies==420000) 
+				domain->level[j].sub_frequencies=107000;
 			}
-			seq_printf(s, "\t\t\t[Frequency] : (MAIN)%u, (SUB)%u\n",
+			seq_printf(s, "\t\t\t[Frequency] : (MAIN)%u, (SUB)%u - topser99\n",
 					domain->level[j].main_frequencies,
 					domain->level[j].sub_frequencies);
-			//pr_info("Frequency : %u kHz - SUB : %u kHz topser99\n",
-			//		domain->level[j].main_frequencies,domain->level[j].sub_frequencies);
 		}
 	}
 

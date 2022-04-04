@@ -973,32 +973,94 @@ static int init_constraint_table_ect(struct exynos_cpufreq_domain *domain,
 
 		for (c_index = 0; c_index < ect_domain->num_of_level; c_index++) {
 			/* find row same as frequency */
-			if (freq == ect_domain->level[c_index].main_frequencies)  {
-				dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies;//main is cpu freq, cons and sub is int
-			//for minlock
-			if (domain->id==0)
+			if (freq == ect_domain->level[c_index].main_frequencies) {
+				dm->c.freq_table[index].constraint_freq
+					= ect_domain->level[c_index].sub_frequencies;
+
+			/* MINLOCK_TABLE */
+			if(domain->id==0)
 			{
-				if (freq==1794000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
-				if (freq==1690000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
-				if (freq==1586000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
+				if(ect_domain->level[c_index].main_frequencies==2002000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1898000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1794000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1690000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1586000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1482000)
+					ect_domain->level[c_index].sub_frequencies==333000;
+				if(ect_domain->level[c_index].main_frequencies==1352000)
+					ect_domain->level[c_index].sub_frequencies==267000;
+				if(ect_domain->level[c_index].main_frequencies==1248000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==1144000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==1014000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==902000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==839000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==757000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==676000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==546000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==449000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==343000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==208000)
+					ect_domain->level[c_index].sub_frequencies==107000;
 			}
-			if (domain->id==1)
+			if(domain->id==1)
 			{
-				if (freq==2288000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
-				if (freq==2184000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
-				if (freq==2080000)
-					dm->c.freq_table[index].constraint_freq= ect_domain->level[c_index].sub_frequencies=333000;
+				if(ect_domain->level[c_index].main_frequencies==2496000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==2392000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==2288000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==2184000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==2080000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1976000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1872000)
+					ect_domain->level[c_index].sub_frequencies==533000;
+				if(ect_domain->level[c_index].main_frequencies==1768000)
+					ect_domain->level[c_index].sub_frequencies==333000;
+				if(ect_domain->level[c_index].main_frequencies==1664000)
+					ect_domain->level[c_index].sub_frequencies==333000;
+				if(ect_domain->level[c_index].main_frequencies==1560000)
+					ect_domain->level[c_index].sub_frequencies==267000;
+				if(ect_domain->level[c_index].main_frequencies==1352000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==1144000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==936000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==728000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==520000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==312000)
+					ect_domain->level[c_index].sub_frequencies==107000;
+				if(ect_domain->level[c_index].main_frequencies==208000)
+					ect_domain->level[c_index].sub_frequencies==107000;
 			}
 				valid_row = true;
 				break;
 			}
 		}
-pr_info("constraint_table_ect: freq : %u kHz - dm->c.freq_table[index].constraint_freq : %u kHz - topser99\n",freq,dm->c.freq_table[index].constraint_freq);
+		pr_info("ect_minlock_domain: (MAIN)%u, (SUB)%u - topser99\n",
+					ect_domain->level[c_index].main_frequencies,
+					ect_domain->level[c_index].sub_frequencies);
 		/*
 		 * Due to higher levels of constraint_freq should not be NULL,
 		 * they should be filled with highest value of sub_frequencies of ect
